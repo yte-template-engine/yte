@@ -53,7 +53,7 @@ def _process_dict(yaml_value, variables):
             _variables = dict(variables)
             _variables["_yte_value"] = value
             _variables["_yte_variables"] = _variables
-            yield from eval(f"[process_yaml_value(_yte_value, _yte_variables) {key[1:]}]", _variables)
+            yield from eval(f"[process_yaml_value(_yte_value, dict(_yte_variables, **locals())) {key[1:]}]", _variables)
         elif re_if.match(key):
             yield from conditional.process_conditional(variables)
             expr = re_if.match(key).group("expr")
@@ -70,7 +70,8 @@ def _process_dict(yaml_value, variables):
             yield from conditional.process_conditional(variables)
         else:
             yield from conditional.process_conditional(variables)
-            yield {key: process_yaml_value(value, variables)}
+            yield {process_yaml_value(key, variables): process_yaml_value(value, variables)}
+    yield from conditional.process_conditional(variables)
 
 
 class Conditional:
@@ -83,7 +84,9 @@ class Conditional:
             variables = dict(variables)
             variables.update(self.value_dict)
             variables["_yte_variables"] = variables
-            yield eval(self.conditional_expr(), variables)
+            result = eval(self.conditional_expr(), variables)
+            if result is not None:
+                yield result
             self.exprs.clear()
             self.values.clear()
 
