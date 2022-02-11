@@ -27,3 +27,9 @@ jobs:
 
       - name: Run pytest
         run: poetry run python -m pytest -v --cov=yte/ tests.py
+
+      - name: Run Coverage
+        run: poetry run python -m coverage report -m;
+
+      - name: Generate XML Report
+        run: poetry run python -m coverage xml
