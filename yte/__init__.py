@@ -8,6 +8,9 @@ re_else = re.compile(r"^\?else$")
 
 
 def process_yaml(path_or_str, variables=None):
+    """Process a YAML file or string with YTE,
+    returning the processed version.
+    """
     if variables is None:
         variables = dict()
     variables["_process_yaml_value"] = _process_yaml_value
