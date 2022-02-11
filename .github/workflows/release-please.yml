@@ -29,6 +29,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
 
       - name: Install Dependencies using Poetry
+        if: ${{ steps.release.outputs.release_created }}
         run: poetry install
       
       - name: Publish to PyPi
