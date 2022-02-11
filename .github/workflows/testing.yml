@@ -17,7 +17,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
 
       - name: Check formatting
-        run: poetry run black --check yte tests.py
+        run: poetry run black --check .
 
   linting:
     runs-on: ubuntu-latest
@@ -63,10 +63,7 @@ jobs:
         run: poetry install
 
       - name: Run pytest
-        run: poetry run python -m pytest -v --cov=yte/ tests.py
+        run: poetry run coverage run -m pytest tests.py
 
       - name: Run Coverage
-        run: poetry run python -m coverage report -m;
-
-      - name: Generate XML Report
-        run: poetry run python -m coverage xml
+        run: poetry run coverage report -m

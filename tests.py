@@ -1,5 +1,6 @@
 import yte
 import textwrap
+import pytest
 
 
 def _process(yaml_str):
@@ -10,11 +11,11 @@ def test_ifelse():
     result = _process(
         """
     ?if True:
-        foo: 1
+      foo: 1
     ?elif False:
-        bar: 2
+      bar: 2
     ?else:
-        bar: 1
+      bar: 1
     """
     )
     assert result == {"foo": 1}
@@ -30,3 +31,61 @@ def test_for():
     """
     )
     assert result == {"key0": 1, "key1": 1, "foo": True}
+
+
+def test_list():
+    result = _process(
+        """
+        - foo
+        - bar
+        - ?if True:
+            baz
+          ?else:
+            bar
+        """
+    )
+    assert result == ["foo", "bar", "baz"]
+
+
+def test_if_list():
+    result = _process(
+        """
+        ?if True:
+          - a
+          - b
+        """
+    )
+    assert result == ["a", "b"]
+
+
+def test_fail_mixed_loop_return():
+    with pytest.raises(ValueError):
+        _process(
+            """
+            ?for i in range(2):
+              ?if i == 0:
+                - foo
+              ?else:
+                bar: True
+            """
+        )
+
+
+def test_unexpected_elif():
+    with pytest.raises(ValueError):
+        _process(
+            """
+            ?elif True:
+              foo: True
+            """
+        )
+
+
+def test_unexpected_else():
+    with pytest.raises(ValueError):
+        _process(
+            """
+            ?else:
+              foo: True
+            """
+        )

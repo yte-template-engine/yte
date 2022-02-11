@@ -10,27 +10,29 @@ re_else = re.compile(r"^\?else$")
 def process_yaml(path_or_str, variables=None):
     if variables is None:
         variables = dict()
-    variables["process_yaml_value"] = process_yaml_value
-    return process_yaml_value(yaml.load(path_or_str, Loader=yaml.FullLoader), variables)
+    variables["_process_yaml_value"] = _process_yaml_value
+    return _process_yaml_value(
+        yaml.load(path_or_str, Loader=yaml.FullLoader), variables
+    )
 
 
-def process_yaml_value(yaml_value, variables: dict):
+def _process_yaml_value(yaml_value, variables: dict):
     if isinstance(yaml_value, dict):
-        return process_dict(yaml_value, variables)
+        return _process_dict(yaml_value, variables)
     elif isinstance(yaml_value, list):
-        return [process_yaml_value(item, variables) for item in yaml_value]
-    elif is_expr(yaml_value):
+        return [_process_yaml_value(item, variables) for item in yaml_value]
+    elif _is_expr(yaml_value):
         return eval(yaml_value[1:], variables)
     else:
         return yaml_value
 
 
-def is_expr(yaml_value):
+def _is_expr(yaml_value):
     return isinstance(yaml_value, str) and yaml_value.startswith("?")
 
 
-def process_dict(yaml_value, variables):
-    items = list(_process_dict(yaml_value, variables))
+def _process_dict(yaml_value, variables):
+    items = list(_process_dict_items(yaml_value, variables))
     if all(isinstance(item, dict) for item in items):
         result = dict()
         for item in items:
@@ -38,13 +40,15 @@ def process_dict(yaml_value, variables):
         return result
     elif all(isinstance(item, list) for item in items):
         return [item for sublist in items for item in sublist]
+    elif len(items) == 1:
+        return items[0]
     else:
         raise ValueError(
             "Conditional or for loop did not consistently return map or list."
         )
 
 
-def _process_dict(yaml_value, variables):
+def _process_dict_items(yaml_value, variables):
     conditional = Conditional()
 
     for key, value in yaml_value.items():
@@ -54,7 +58,8 @@ def _process_dict(yaml_value, variables):
             _variables["_yte_value"] = value
             _variables["_yte_variables"] = _variables
             yield from eval(
-                f"[process_yaml_value(_yte_value, dict(_yte_variables, **locals())) {key[1:]}]",
+                f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals())) "
+                f"{key[1:]}]",
                 _variables,
             )
         elif re_if.match(key):
@@ -74,7 +79,9 @@ def _process_dict(yaml_value, variables):
         else:
             yield from conditional.process_conditional(variables)
             yield {
-                process_yaml_value(key, variables): process_yaml_value(value, variables)
+                _process_yaml_value(key, variables): _process_yaml_value(
+                    value, variables
+                )
             }
     yield from conditional.process_conditional(variables)
 
@@ -98,11 +105,11 @@ class Conditional:
     def conditional_expr(self, index=0):
         if index < len(self.exprs):
             return (
-                f"process_yaml_value({self.value_name(index)}, _yte_variables) "
+                f"_process_yaml_value({self.value_name(index)}, _yte_variables) "
                 f"if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
             )
         if index < len(self.values):
-            return "process_yaml_value(self.value_name(index), _yte_variables)"
+            return f"_process_yaml_value({self.value_name(index)}, _yte_variables)"
         else:
             return "None"
 
