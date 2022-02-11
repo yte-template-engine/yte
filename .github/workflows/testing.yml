@@ -1,0 +1,38 @@
+name: Pull-Request-Checks
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry
+        uses: dschep/install-poetry-action@v1.2
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.virtualenvs
+          key: poetry-$
+          restore-keys: |
+            poetry-$
+
+      - name: Install Dependencies using Poetry
+        run: poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Run pytest
+        run: poetry run python -m pytest -v --cov=yte/ tests.py
+
+      - name: Run Coverage
+        run: poetry run python -m coverage report -m;
+
+      - name: Generate XML Report
+        run: poetry run python -m coverage xml
