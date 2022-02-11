@@ -1,12 +1,10 @@
-from concurrent.futures import process
 import yaml
-from pathlib import Path
 import re
 
-re_for_loop = re.compile("^\?for .+ in .+$")
-re_if = re.compile("^\?if (?P<expr>.+)$")
-re_elif = re.compile("^\?elif (?P<expr>.+)$")
-re_else = re.compile("^\?else$")
+re_for_loop = re.compile(r"^\?for .+ in .+$")
+re_if = re.compile(r"^\?if (?P<expr>.+)$")
+re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
+re_else = re.compile(r"^\?else$")
 
 
 def process_yaml(path_or_str, variables=None):
@@ -41,7 +39,9 @@ def process_dict(yaml_value, variables):
     elif all(isinstance(item, list) for item in items):
         return [item for sublist in items for item in sublist]
     else:
-        raise ValueError("Conditional or for loop did not consistently return map or list.")
+        raise ValueError(
+            "Conditional or for loop did not consistently return map or list."
+        )
 
 
 def _process_dict(yaml_value, variables):
@@ -53,7 +53,10 @@ def _process_dict(yaml_value, variables):
             _variables = dict(variables)
             _variables["_yte_value"] = value
             _variables["_yte_variables"] = _variables
-            yield from eval(f"[process_yaml_value(_yte_value, dict(_yte_variables, **locals())) {key[1:]}]", _variables)
+            yield from eval(
+                f"[process_yaml_value(_yte_value, dict(_yte_variables, **locals())) {key[1:]}]",
+                _variables,
+            )
         elif re_if.match(key):
             yield from conditional.process_conditional(variables)
             expr = re_if.match(key).group("expr")
@@ -70,7 +73,9 @@ def _process_dict(yaml_value, variables):
             yield from conditional.process_conditional(variables)
         else:
             yield from conditional.process_conditional(variables)
-            yield {process_yaml_value(key, variables): process_yaml_value(value, variables)}
+            yield {
+                process_yaml_value(key, variables): process_yaml_value(value, variables)
+            }
     yield from conditional.process_conditional(variables)
 
 
@@ -92,16 +97,19 @@ class Conditional:
 
     def conditional_expr(self, index=0):
         if index < len(self.exprs):
-            return f"process_yaml_value({self.value_name(index)}, _yte_variables) if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
+            return (
+                f"process_yaml_value({self.value_name(index)}, _yte_variables) "
+                f"if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
+            )
         if index < len(self.values):
-            return f"process_yaml_value(self.value_name(index), _yte_variables)"
+            return "process_yaml_value(self.value_name(index), _yte_variables)"
         else:
             return "None"
 
     def register_if(self, expr, value):
         self.exprs.append(expr)
         self.values.append(value)
-    
+
     def register_else(self, value):
         self.values.append(value)
 
@@ -111,6 +119,6 @@ class Conditional:
     @property
     def value_dict(self):
         return {self.value_name(i): value for i, value in enumerate(self.values)}
-    
+
     def value_name(self, index):
         return f"_yte_value_{index}"

@@ -11,7 +11,16 @@ pyyaml = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
-coverage = "^6.3"
+coverage = {extras = ["toml"], version = "^6.3.1"}
+flake8 = "^4.0.1"
+flake8-bugbear = "^22.1.11"
+black = "^22.1.0"
+
+[tool.coverage.run]
+omit = [".*", "*/site-packages/*"]
+
+[tool.coverage.report]
+fail_under = 100
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

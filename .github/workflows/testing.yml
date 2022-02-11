@@ -1,7 +1,44 @@
 name: Pull-Request-Checks
+
 on: [push]
+
 jobs:
-  test:
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.0.0
+
+      - name: Check formatting
+        run: poetry run black --check yte tests.py
+
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.0.0
+
+      - name: Check code
+        run: poetry run flake8
+
+  testing:
+    needs:
+      - formatting
+      - linting
     strategy:
       fail-fast: false
       matrix:
