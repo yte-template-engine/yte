@@ -27,4 +27,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
       
       - name: Publish to PyPi
-        run: poetry publish
+        env:
+          PYPI_USERNAME: __token__
+          PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: poetry publish --username $PYPI_USERNAME --password $PYPI_PASSWORD
