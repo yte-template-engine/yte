@@ -16,6 +16,9 @@ jobs:
       - name: Setup poetry
         uses: abatilo/actions-poetry@v2.0.0
 
+      - name: Install Dependencies using Poetry
+        run: poetry install
+
       - name: Check formatting
         run: poetry run black --check .
 
@@ -31,6 +34,9 @@ jobs:
 
       - name: Setup poetry
         uses: abatilo/actions-poetry@v2.0.0
+
+      - name: Install Dependencies using Poetry
+        run: poetry install
 
       - name: Check code
         run: poetry run flake8
