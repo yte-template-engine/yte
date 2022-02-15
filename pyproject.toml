@@ -1,27 +1,37 @@
 [tool.poetry]
+authors = ["Johannes Köster <johannes.koester@tu-dortmund.de>"]
+description = "A YAML template engine with Python expressions"
+license = "MIT"
 name = "yte"
 version = "0.1.0"
-description = "A YAML template engine with Python expressions"
-authors = ["Johannes Köster <johannes.koester@tu-dortmund.de>"]
-license = "MIT"
 
 [tool.poetry.dependencies]
+plac = "^1.3.4"
 python = "^3.9"
 pyyaml = "^6.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.0"
+black = "^22.1.0"
 coverage = {extras = ["toml"], version = "^6.3.1"}
 flake8 = "^4.0.1"
 flake8-bugbear = "^22.1.11"
-black = "^22.1.0"
+pytest = "^7.0"
 
 [tool.coverage.run]
 omit = [".*", "*/site-packages/*"]
 
 [tool.coverage.report]
+# exclude CLI handling lines. They cannot be captured properly by coverage, but we have a testcase for them.
+exclude_lines = [
+  "yaml\\.dump\\(result, outfile\\)",
+  "process_yaml\\(sys.stdin, outfile=sys\\.stdout\\)",
+  "plac.call\\(cli\\)",
+]
 fail_under = 100
 
+[tool.poetry.scripts]
+yte = "yte:main"
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

@@ -1,6 +1,7 @@
 import yte
 import textwrap
 import pytest
+import subprocess as sp
 
 
 def _process(yaml_str):
@@ -89,3 +90,7 @@ def test_unexpected_else():
               foo: True
             """
         )
+
+
+def test_cli():
+    sp.check_call("echo -e '?if True:\n  foo: 1' | yte", shell=True)
