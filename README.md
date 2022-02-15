@@ -12,7 +12,7 @@ YTE is a template engine for YAML format that utilizes the YAML structure in com
 The key idea of YTE is to rely on the YAML structure to enable conditionals, loops and other arbitrary Python expressions to dynamically render YAML files.
 Python expressions are thereby declared by prepending them with a `?` anywhere in the YAML.
 Any such value will be automatically evaluated by YTE, yielding plain YAML as a result.
-Importantly, YTE templates are still valid YAML files.
+Importantly, YTE templates are still valid YAML files (for YAML, the `?` expressions are just strings).
 
 ### Examples
 
