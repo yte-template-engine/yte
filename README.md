@@ -3,6 +3,9 @@
 [![test coverage: 100%](https://img.shields.io/badge/test%20coverage-100%25-green)](https://github.com/koesterlab/yte/blob/main/pyproject.toml#L30)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/koesterlab/yte/CI)
 ![PyPI](https://img.shields.io/pypi/v/yte)
+[![Conda Recipe](https://img.shields.io/badge/recipe-yte-green.svg)](https://anaconda.org/conda-forge/yte)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
 
 
 YTE is a template engine for YAML format that utilizes the YAML structure in combination with Python expressions for enabling to dynamically build YAML documents.
@@ -12,7 +15,7 @@ YTE is a template engine for YAML format that utilizes the YAML structure in com
 The key idea of YTE is to rely on the YAML structure to enable conditionals, loops and other arbitrary Python expressions to dynamically render YAML files.
 Python expressions are thereby declared by prepending them with a `?` anywhere in the YAML.
 Any such value will be automatically evaluated by YTE, yielding plain YAML as a result.
-Importantly, YTE templates are still valid YAML files.
+Importantly, YTE templates are still valid YAML files (for YAML, the `?` expressions are just strings).
 
 ### Examples
 

@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.1](https://www.github.com/koesterlab/yte/compare/v0.1.0...v0.1.1) (2022-02-15)
+
+
+### Bug Fixes
+
+* more relaxed Python version dependency, more metadata ([#2](https://www.github.com/koesterlab/yte/issues/2)) ([545275f](https://www.github.com/koesterlab/yte/commit/545275ff90071c400b06ae7512db530dafb197a9))
+
 ## 0.1.0 (2022-02-15)
 
 
