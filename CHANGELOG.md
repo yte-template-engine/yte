@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://www.github.com/koesterlab/yte/compare/v0.1.1...v0.2.0) (2022-02-18)
+
+
+### Features
+
+* python 3.7 support ([#4](https://www.github.com/koesterlab/yte/issues/4)) ([fcd69e2](https://www.github.com/koesterlab/yte/commit/fcd69e28e8af53789f04015e89e64fab03bf1701))
+
 ### [0.1.1](https://www.github.com/koesterlab/yte/compare/v0.1.0...v0.1.1) (2022-02-15)
 
 
