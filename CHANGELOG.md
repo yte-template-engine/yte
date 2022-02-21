@@ -2,14 +2,7 @@
 
 ## [1.0.0](https://www.github.com/koesterlab/yte/compare/v0.2.0...v1.0.0) (2022-02-21)
 
-
-### ⚠ BREAKING CHANGES
-
-* bump to stable release
-
-### Features
-
-* bump to stable release ([65c6d43](https://www.github.com/koesterlab/yte/commit/65c6d43859a514d5f14155a3573a4d9471435a48))
+first stable language release
 
 ## [0.2.0](https://www.github.com/koesterlab/yte/compare/v0.1.1...v0.2.0) (2022-02-18)
 
