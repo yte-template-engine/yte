@@ -5,7 +5,7 @@
 ![PyPI](https://img.shields.io/pypi/v/yte)
 [![Conda Recipe](https://img.shields.io/badge/recipe-yte-green.svg)](https://anaconda.org/conda-forge/yte)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
-[![Conda Version](https://img.shields.io/conda/vn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/yte.svg)](https://github.com/conda-forge/yte-feedstock)
 
 
 YTE is a template engine for YAML format that utilizes the YAML structure in combination with Python expressions for enabling to dynamically build YAML documents.
