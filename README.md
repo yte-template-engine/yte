@@ -86,3 +86,20 @@ with open("the-template.yaml", "r") as template:
 with open("the-template.yaml", "r") as template, open("the-rendered-version.yaml", "w") as outfile:
     result = process_yaml(template, outfile=outfile, variables=variables)
 ```
+
+## Comparison with other tools
+
+Lots of template engines are available, for example the famous generic [jinja2](https://jinja.palletsprojects.com).
+The reasons to generate a YAML specific engine are
+
+1. The YAML syntax can be exploited to simplify template expression syntax, and make it feel less foreign (i.e. fewer special characters for control flow needed) while increasing human readability.
+2. Whitespace handling (which is important with YAML since it has a semantic there) becomes unnecessary (e.g. with jinja2, some [tuning](https://radeksprta.eu/posts/control-whitespace-in-ansible-templates) is required to obtain proper YAML rendering).
+
+Of course, YTE is not the first YAML specific template engine.
+Others include
+
+* [Yglu](https://yglu.io)
+* [Emrichen](https://github.com/con2/emrichen)
+
+The main difference between YTE and these two is that YTE extends YAML with plain Python syntax instead of introducing another specialized language.
+Of course, the choice is also a matter of taste.
