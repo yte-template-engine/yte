@@ -87,7 +87,7 @@ with open("the-template.yaml", "r") as template, open("the-rendered-version.yaml
     result = process_yaml(template, outfile=outfile, variables=variables)
 ```
 
-## Comparison with other tools
+## Comparison with other engines
 
 Lots of template engines are available, for example the famous generic [jinja2](https://jinja.palletsprojects.com).
 The reasons to generate a YAML specific engine are
