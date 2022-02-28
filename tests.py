@@ -92,5 +92,27 @@ def test_unexpected_else():
         )
 
 
+def test_custom_import():
+    result = _process(
+        """
+        __imports__:
+          - from itertools import product
+        ?for a in product([1, 2], [3]):
+          - a
+        """
+    )
+    assert result == ["a"] * 2
+
+
+def test_custom_import_syntax_error():
+    with pytest.raises(ValueError):
+        result = _process(
+            """
+          __imports__:
+            from itertools import product
+          """
+        )
+
+
 def test_cli():
     sp.check_call("echo -e '?if True:\n  foo: 1' | yte", shell=True)
