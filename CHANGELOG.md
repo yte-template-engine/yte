@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://www.github.com/koesterlab/yte/compare/v1.0.0...v1.1.0) (2022-02-28)
+
+
+### Features
+
+* allow import statements via special keyword __imports__ ([be4e497](https://www.github.com/koesterlab/yte/commit/be4e497d952747169db1418f288f2025a1654153))
+
+
+### Documentation
+
+* import keyword ([4582037](https://www.github.com/koesterlab/yte/commit/45820379337d5b98e3a70290e9488d11cd3022af))
+
 ## [1.0.0](https://www.github.com/koesterlab/yte/compare/v0.2.0...v1.0.0) (2022-02-21)
 
 first stable language release
