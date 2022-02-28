@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/koesterlab/yte/compare/v1.1.0...v1.2.0) (2022-02-28)
+
+
+### Features
+
+* rename __imports__ into __definitions__ reflecting that it actually allows arbitrary Python statements ([35dde8f](https://www.github.com/koesterlab/yte/commit/35dde8f7cb9c8a71d9006f116972ed89d3795535))
+
 ## [1.1.0](https://www.github.com/koesterlab/yte/compare/v1.0.0...v1.1.0) (2022-02-28)
 
 
