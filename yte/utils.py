@@ -43,37 +43,15 @@ def _process_dict_items(yaml_value, variables):
 
     for key, value in yaml_value.items():
         if key == "__imports__":
-            if isinstance(value, list):
-                for item in value:
-                    exec(item, variables)
-            else:
-                raise ValueError(
-                    "__imports__ keyword expects a list of import statements"
-                )
+            _process_imports(value, variables)
         elif re_for_loop.match(key):
-            yield from conditional.process_conditional(variables)
-            _variables = dict(variables)
-            _variables["_yte_value"] = value
-            _variables["_yte_variables"] = _variables
-            yield from eval(
-                f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals())) "
-                f"{key[1:]}]",
-                _variables,
-            )
+            yield from _process_for_loop(key, value, variables, conditional)
         elif re_if.match(key):
-            yield from conditional.process_conditional(variables)
-            expr = re_if.match(key).group("expr")
-            conditional.register_if(expr, value)
+            yield from _process_if(key, value, variables, conditional)
         elif re_elif.match(key):
-            if conditional.is_empty():
-                raise ValueError("Unexpected elif: no if or elif before")
-            expr = re_elif.match(key).group("expr")
-            conditional.register_if(expr, value)
+            _process_elif(key, value, variables, conditional)
         elif re_else.match(key):
-            if conditional.is_empty():
-                raise ValueError("Unexpected else: no if or elif before")
-            conditional.register_else(value)
-            yield from conditional.process_conditional(variables)
+            yield from _process_else(value, variables, conditional)
         else:
             yield from conditional.process_conditional(variables)
             yield {
@@ -81,6 +59,46 @@ def _process_dict_items(yaml_value, variables):
                     value, variables
                 )
             }
+    yield from conditional.process_conditional(variables)
+
+
+def _process_imports(value, variables):
+    if isinstance(value, list):
+        for item in value:
+            exec(item, variables)
+    else:
+        raise ValueError("__imports__ keyword expects a list of import statements")
+
+
+def _process_for_loop(key, value, variables, conditional):
+    yield from conditional.process_conditional(variables)
+    _variables = dict(variables)
+    _variables["_yte_value"] = value
+    _variables["_yte_variables"] = _variables
+    yield from eval(
+        f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals())) "
+        f"{key[1:]}]",
+        _variables,
+    )
+
+
+def _process_if(key, value, variables, conditional):
+    yield from conditional.process_conditional(variables)
+    expr = re_if.match(key).group("expr")
+    conditional.register_if(expr, value)
+
+
+def _process_elif(key, value, variables, conditional):
+    if conditional.is_empty():
+        raise ValueError("Unexpected elif: no if or elif before")
+    expr = re_elif.match(key).group("expr")
+    conditional.register_if(expr, value)
+
+
+def _process_else(value, variables, conditional):
+    if conditional.is_empty():
+        raise ValueError("Unexpected else: no if or elif before")
+    conditional.register_else(value)
     yield from conditional.process_conditional(variables)
 
 

@@ -106,7 +106,7 @@ def test_custom_import():
 
 def test_custom_import_syntax_error():
     with pytest.raises(ValueError):
-        result = _process(
+        _process(
             """
           __imports__:
             from itertools import product
