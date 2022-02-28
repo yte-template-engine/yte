@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.0](https://www.github.com/koesterlab/yte/compare/v0.2.0...v1.0.0) (2022-02-21)
+
+first stable language release
+
 ## [0.2.0](https://www.github.com/koesterlab/yte/compare/v0.1.1...v0.2.0) (2022-02-18)
 
 
