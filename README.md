@@ -50,15 +50,36 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
     bar
 ```
 
-```yaml
+<table>
+  <tr>
+    <th>template</th>
+    <th>rendered</th>
+  </tr>
+  <tr>
+    <td>
+
+      <pre lang="yaml">
 # the special keyword __imports__ allows to define custom import statements
 __imports__:
   - from itertools import product
 
 ?for item in product([1, 2], ["a", "b"]):
   - ?f"{item}"
+      </pre>
+
+    </td>
+    <td>
+
+```yaml
+- 1-a
+- 1-b
+- 2-a
+- 2-b
 ```
 
+    </td>
+  </tr>
+</table>
 
 ## Usage
 
