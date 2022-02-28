@@ -19,6 +19,10 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 
 ### Examples
 
+#### Conditionals
+
+##### Template
+
 ```yaml
 ?if True:
   foo: 1
@@ -28,18 +32,28 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
   bar: 1
 ```
 
+##### Rendered
+
 ```yaml
-?for i in range(2):
-  ?f"key{i}": 1
-  ?if i == 1:
-      foo: True
+foo: 1
 ```
+
+##### Template
 
 ```yaml
 ?if True:
   - a
   - b
 ```
+
+##### Rendered
+
+```yaml
+- a
+- b
+```
+
+##### Template
 
 ```yaml
 - foo
@@ -50,15 +64,56 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
     bar
 ```
 
-```yaml
-# the special keyword __imports__ allows to define custom import statements
-__imports__:
-  - from itertools import product
+##### Rendered
 
-?for item in product([1, 2], ["a", "b"]):
-  - ?f"{item}"
+
+```yaml
+- foo
+- bar
+- baz
 ```
 
+
+#### Loops
+
+##### Template
+
+```yaml
+?for i in range(2):
+  ?f"key{i}": 1
+  ?if i == 1:
+      foo: true
+```
+
+##### Rendered
+
+```yaml
+key0: 1
+key1: 1
+foo: true
+```
+
+#### Custom imports
+
+##### Template
+
+```yaml
+  # the special keyword __imports__ allows to define custom import statements
+  __imports__:
+    - from itertools import product
+
+  ?for item in product([1, 2], ["a", "b"]):
+    - ?f"{item}"
+```
+
+##### Rendered
+
+```yaml
+- 1-a
+- 1-b
+- 2-a
+- 2-b
+```
 
 ## Usage
 
