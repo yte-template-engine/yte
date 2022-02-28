@@ -93,17 +93,21 @@ key1: 1
 foo: true
 ```
 
-#### Custom imports
+#### Custom definitions
 
 ##### Template
 
 ```yaml
-  # the special keyword __imports__ allows to define custom import statements
+  # the special keyword __definitions__ allows to define custom statements
   __imports__:
     - from itertools import product
+    - |
+      def squared(value):
+          return value ** 2
 
   ?for item in product([1, 2], ["a", "b"]):
     - ?f"{item}"
+  - ?squared(2)
 ```
 
 ##### Rendered
@@ -113,6 +117,7 @@ foo: true
 - 1-b
 - 2-a
 - 2-b
+- 4
 ```
 
 ## Usage

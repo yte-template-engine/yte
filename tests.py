@@ -95,7 +95,7 @@ def test_unexpected_else():
 def test_custom_import():
     result = _process(
         """
-        __imports__:
+        __definitions__:
           - from itertools import product
         ?for a in product([1, 2], [3]):
           - a
@@ -108,10 +108,36 @@ def test_custom_import_syntax_error():
     with pytest.raises(ValueError):
         _process(
             """
-          __imports__:
+          __definitions__:
             from itertools import product
           """
         )
+
+
+def test_variable_definition():
+    result = _process(
+        """
+        __definitions__:
+          - foo = 1
+        ?for a in range(2):
+          - ?foo
+        """
+    )
+    assert result == [1] * 2
+
+
+def test_func_definition():
+    result = _process(
+        """
+        __definitions__:
+          - |
+            def foo():
+                return 1
+        ?for a in range(2):
+          - ?foo()
+        """
+    )
+    assert result == [1] * 2
 
 
 def test_cli():

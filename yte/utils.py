@@ -42,8 +42,8 @@ def _process_dict_items(yaml_value, variables):
     conditional = Conditional()
 
     for key, value in yaml_value.items():
-        if key == "__imports__":
-            _process_imports(value, variables)
+        if key == "__definitions__":
+            _process_definitions(value, variables)
         elif re_for_loop.match(key):
             yield from _process_for_loop(key, value, variables, conditional)
         elif re_if.match(key):
@@ -62,12 +62,12 @@ def _process_dict_items(yaml_value, variables):
     yield from conditional.process_conditional(variables)
 
 
-def _process_imports(value, variables):
+def _process_definitions(value, variables):
     if isinstance(value, list):
         for item in value:
             exec(item, variables)
     else:
-        raise ValueError("__imports__ keyword expects a list of import statements")
+        raise ValueError("__definitions__ keyword expects a list of Python statements")
 
 
 def _process_for_loop(key, value, variables, conditional):
