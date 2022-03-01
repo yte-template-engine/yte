@@ -99,7 +99,7 @@ foo: true
 
 ```yaml
   # the special keyword __definitions__ allows to define custom statements
-  __imports__:
+  __definitions__:
     - from itertools import product
     - |
       def squared(value):
