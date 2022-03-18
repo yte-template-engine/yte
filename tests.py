@@ -157,7 +157,7 @@ def test_colon():
 
 def test_colon_unquoted():
     with pytest.raises(yaml.scanner.ScannerError):
-        result = _process(
+        _process(
             """
             ?for sample in ["normal", "tumor"]:
               ?f"{sample}: observations": 1
