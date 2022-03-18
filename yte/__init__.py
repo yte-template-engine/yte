@@ -11,9 +11,17 @@ def process_yaml(file_or_str, outfile=None, variables=None):
     if variables is None:
         variables = dict()
     variables["_process_yaml_value"] = _process_yaml_value
-    result = _process_yaml_value(
-        yaml.load(file_or_str, Loader=yaml.FullLoader), variables
-    )
+
+    try:
+        yaml_doc = yaml.load(file_or_str, Loader=yaml.FullLoader)
+    except yaml.scanner.ScannerError as e:
+        raise yaml.scanner.ScannerError(
+            f"{e}\nNote that certain characters like colons have a special "
+            "meaning in YAML and hence keys or values containing them have "
+            "to be quoted."
+        )
+
+    result = _process_yaml_value(yaml_doc, variables)
 
     if outfile is not None:
         yaml.dump(result, outfile)

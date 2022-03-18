@@ -1,6 +1,7 @@
 import yte
 import textwrap
 import pytest
+import yaml
 import subprocess as sp
 
 
@@ -142,3 +143,23 @@ def test_func_definition():
 
 def test_cli():
     sp.check_call("echo -e '?if True:\n  foo: 1' | yte", shell=True)
+
+
+def test_colon():
+    result = _process(
+        """
+        ?for sample in ["normal", "tumor"]:
+          '?f"{sample}: observations"': 1
+        """
+    )
+    assert result == {"normal: observations": 1, "tumor: observations": 1}
+
+
+def test_colon_unquoted():
+    with pytest.raises(yaml.scanner.ScannerError):
+        _process(
+            """
+            ?for sample in ["normal", "tumor"]:
+              ?f"{sample}: observations": 1
+            """
+        )
