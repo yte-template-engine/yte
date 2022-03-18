@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.2.1](https://www.github.com/koesterlab/yte/compare/v1.2.0...v1.2.1) (2022-03-18)
+
+
+### Bug Fixes
+
+* improved error message in case of YAML syntax errors ([#11](https://www.github.com/koesterlab/yte/issues/11)) ([4377e22](https://www.github.com/koesterlab/yte/commit/4377e22566edbff34083687256fb269b95ee788b))
+
+
+### Documentation
+
+* Fix example for __definitions__ ([#9](https://www.github.com/koesterlab/yte/issues/9)) ([4fff096](https://www.github.com/koesterlab/yte/commit/4fff096109b5e3ed5141e4294232c20aaf2bdd1f))
+
 ## [1.2.0](https://www.github.com/koesterlab/yte/compare/v1.1.0...v1.2.0) (2022-02-28)
 
 
