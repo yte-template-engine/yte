@@ -1,6 +1,7 @@
 import yte
 import textwrap
 import pytest
+import yaml
 import subprocess as sp
 
 
@@ -152,3 +153,14 @@ def test_colon():
         """
     )
     assert result == {"normal: observations": 1, "tumor: observations": 1}
+
+
+def test_colon_unquoted():
+    with pytest.raises(yaml.scanner.ScannerError):
+        result = _process(
+            """
+            ?for sample in ["normal", "tumor"]:
+              ?f"{sample}: observations": 1
+            """
+        )
+        assert result == {"normal: observations": 1, "tumor: observations": 1}
