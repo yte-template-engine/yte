@@ -148,7 +148,7 @@ def test_colon():
     result = _process(
         """
         ?for sample in ["normal", "tumor"]:
-          ?f"{sample}: observations": 1
+          '?f"{sample}: observations"': 1
         """
     )
     assert result == {"normal: observations": 1, "tumor: observations": 1}
