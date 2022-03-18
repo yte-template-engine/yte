@@ -80,7 +80,7 @@ foo: 1
 
 ```yaml
 ?for i in range(2):
-  ?f"key{i}": 1
+  '?f"key:{i}"': 1  # When expressions in keys or values contain colons, they need to be additionally quoted.
   ?if i == 1:
       foo: true
 ```
@@ -88,8 +88,8 @@ foo: 1
 ##### Rendered
 
 ```yaml
-key0: 1
-key1: 1
+"key:0": 1
+"key:1": 1
 foo: true
 ```
 
@@ -98,7 +98,8 @@ foo: true
 ##### Template
 
 ```yaml
-  # the special keyword __definitions__ allows to define custom statements
+  # The special keyword __definitions__ allows to define custom statements.
+  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops.
   __definitions__:
     - from itertools import product
     - |
