@@ -163,4 +163,3 @@ def test_colon_unquoted():
               ?f"{sample}: observations": 1
             """
         )
-        assert result == {"normal: observations": 1, "tumor: observations": 1}
