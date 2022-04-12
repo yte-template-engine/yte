@@ -33,8 +33,10 @@ def _process_dict(yaml_value, variables):
     elif len(items) == 1:
         return items[0]
     else:
+
         raise ValueError(
-            "Conditional or for loop did not consistently return map or list."
+            "Conditional or for loop did not consistently return map or list. "
+            f"Returned: {items}"
         )
 
 
