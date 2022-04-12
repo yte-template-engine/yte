@@ -108,7 +108,9 @@ foo: true
 
   ?for item in product([1, 2], ["a", "b"]):
     - ?f"{item}"
-  - ?squared(2)
+
+  ?if True:
+    - ?squared(2)
 ```
 
 ##### Rendered
