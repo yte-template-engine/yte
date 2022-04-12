@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.2](https://www.github.com/koesterlab/yte/compare/v1.2.1...v1.2.2) (2022-04-12)
+
+
+### Documentation
+
+* fix readme example and better error message in case of mixing list and dict returns ([#13](https://www.github.com/koesterlab/yte/issues/13)) ([afc0e69](https://www.github.com/koesterlab/yte/commit/afc0e69b0ab5a9c2087558886336f34227fd248b))
+
 ### [1.2.1](https://www.github.com/koesterlab/yte/compare/v1.2.0...v1.2.1) (2022-03-18)
 
 
