@@ -102,6 +102,7 @@ foo: true
   # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops.
   __definitions__:
     - from itertools import product
+    - someval = 2
     - |
       def squared(value):
           return value ** 2
@@ -110,7 +111,7 @@ foo: true
     - ?f"{item}"
 
   ?if True:
-    - ?squared(2)
+    - ?squared(2) * someval
 ```
 
 ##### Rendered
