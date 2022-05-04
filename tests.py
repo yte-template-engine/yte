@@ -105,7 +105,7 @@ def test_custom_import():
     assert result == ["a"] * 2
 
 
-def test_variable_definition():
+def test_variable_definition1():
     result = _process(
         """
         __definitions__:

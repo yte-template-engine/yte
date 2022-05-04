@@ -12,7 +12,6 @@ def _process_yaml_value(yaml_value, variables: dict):
     elif isinstance(yaml_value, list):
         return [_process_yaml_value(item, variables) for item in yaml_value]
     elif _is_expr(yaml_value):
-        print(yaml_value, variables)
         return eval(yaml_value[1:], variables)
     else:
         return yaml_value
