@@ -110,7 +110,7 @@ def test_variable_definition1():
         """
         __definitions__:
           - test = "foo"
-        
+
         ?test:
           1
         """
@@ -123,7 +123,7 @@ def test_variable_definition3():
         """
         __definitions__:
           - test = "foo"
-        
+
         bar: ?"{foo}"
         """
     )
@@ -136,7 +136,7 @@ def test_variable_definition2():
         __definitions__:
           - foo = "bar"
           - test = "foo"
-        
+
         ?f"{test}":
           1
         """
