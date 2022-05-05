@@ -140,8 +140,9 @@ def test_variable_definition3():
 
         bar: ?test
 
-        __definitions__:
-          - and_now = "for something completely different"
+        ?for _ in []:
+            __definitions__:
+              - and_now = "for something completely different"
         """
     )
     assert result == {"bar": "foo"}
