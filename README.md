@@ -112,7 +112,7 @@ foo: true
 
   ?if True:
     - ?squared(2) * someval
-    - "someval": ?f"{someval}"
+    - someval: ?someval
 ```
 
 ##### Rendered
@@ -123,7 +123,7 @@ foo: true
 - 2-a
 - 2-b
 - 4
-```
+- someval: 2
 
 ## Usage
 

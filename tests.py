@@ -138,7 +138,7 @@ def test_variable_definition3():
         __definitions__:
           - test = "foo"
 
-        bar: ?"{foo}"
+        bar: ?test
         """
     )
     assert result == {"bar": "foo"}
