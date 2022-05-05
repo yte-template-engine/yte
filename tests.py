@@ -118,6 +118,18 @@ def test_variable_definition1():
     assert result == {"foo": 1}
 
 
+def test_variable_definition3():
+    result = _process(
+        """
+        __definitions__:
+          - test = "foo"
+        
+        bar: ?"{foo}"
+        """
+    )
+    assert result == {"bar": "foo"}
+
+
 def test_variable_definition2():
     result = _process(
         """
