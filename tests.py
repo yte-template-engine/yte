@@ -140,12 +140,17 @@ def test_variable_definition3():
 
         bar: ?test
 
-        ?for _ in []:
+        ?for item in ["foo", "baz"]:
             __definitions__:
               - and_now = "for something completely different"
+            ?item: ?and_now
         """
     )
-    assert result == {"bar": "foo"}
+    assert result == {
+        "bar": "foo",
+        "foo": "for something completely different",
+        "baz": "for something completely different",
+    }
 
 
 def test_custom_import_syntax_error():

@@ -99,7 +99,8 @@ foo: true
 
 ```yaml
   # The special keyword __definitions__ allows to define custom statements.
-  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops.
+  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
+  # with the restriction of not having duplicate __definitions__ keys on the same level.
   __definitions__:
     - from itertools import product
     - someval = 2
