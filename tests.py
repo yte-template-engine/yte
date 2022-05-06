@@ -252,7 +252,7 @@ def test_variables():
         __variables__:
           foo: "x"
           bar: 3
-        
+
         ?foo: 1
         bar: ?bar
         """

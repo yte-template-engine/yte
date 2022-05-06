@@ -108,10 +108,10 @@ def _process_definitions(value, variables, context: list):
 
 def _process_variables(value, variables, context: list):
     if isinstance(value, dict):
-        for name, value in value.items():
-            if _is_expr(value):
-                value = _process_expr(value, variables, context)
-            variables[name] = value
+        for name, val in value.items():
+            if _is_expr(val):
+                val = _process_expr(val, variables, context)
+            variables[name] = val
     else:
         raise YteError(
             "__variables__ keyword expects a map of variable names and values", context
@@ -128,7 +128,8 @@ def _process_for_loop(
     _variables["_disable_features"] = disable_features
     _variables["_yte_variables"] = _variables
     yield from eval(
-        f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals()), _context, _disable_features) "
+        f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals()), "
+        "_context, _disable_features) "
         f"{key[1:]}]",
         _variables,
     )
@@ -184,11 +185,15 @@ class Conditional:
     def conditional_expr(self, index=0):
         if index < len(self.exprs):
             return (
-                f"_process_yaml_value({self.value_name(index)}, _yte_variables, _context, _disable_features) "
+                f"_process_yaml_value({self.value_name(index)}, "
+                "_yte_variables, _context, _disable_features) "
                 f"if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
             )
         if index < len(self.values):
-            return f"_process_yaml_value({self.value_name(index)}, _yte_variables, _context, _disable_features)"
+            return (
+                f"_process_yaml_value({self.value_name(index)}, "
+                "_yte_variables, _context, _disable_features)"
+            )
         else:
             return "None"
 
