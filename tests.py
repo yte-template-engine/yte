@@ -105,6 +105,54 @@ def test_custom_import():
     assert result == ["a"] * 2
 
 
+def test_variable_definition1():
+    result = _process(
+        """
+        __definitions__:
+          - test = "foo"
+
+        ?test:
+          1
+        """
+    )
+    assert result == {"foo": 1}
+
+
+def test_variable_definition2():
+    result = _process(
+        """
+        __definitions__:
+          - foo = "bar"
+          - test = "foo"
+
+        ?f"{test}":
+          1
+        """
+    )
+    assert result == {"foo": 1}
+
+
+def test_variable_definition3():
+    result = _process(
+        """
+        __definitions__:
+          - test = "foo"
+
+        bar: ?test
+
+        ?for item in ["foo", "baz"]:
+            __definitions__:
+              - and_now = "for something completely different"
+            ?item: ?and_now
+        """
+    )
+    assert result == {
+        "bar": "foo",
+        "foo": "for something completely different",
+        "baz": "for something completely different",
+    }
+
+
 def test_custom_import_syntax_error():
     with pytest.raises(ValueError):
         _process(

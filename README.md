@@ -99,9 +99,11 @@ foo: true
 
 ```yaml
   # The special keyword __definitions__ allows to define custom statements.
-  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops.
+  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
+  # with the restriction of not having duplicate __definitions__ keys on the same level.
   __definitions__:
     - from itertools import product
+    - someval = 2
     - |
       def squared(value):
           return value ** 2
@@ -110,7 +112,8 @@ foo: true
     - ?f"{item}"
 
   ?if True:
-    - ?squared(2)
+    - ?squared(2) * someval
+    - someval: ?someval
 ```
 
 ##### Rendered
@@ -121,7 +124,7 @@ foo: true
 - 2-a
 - 2-b
 - 4
-```
+- someval: 2
 
 ## Usage
 
