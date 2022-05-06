@@ -27,7 +27,14 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
             "to be quoted."
         )
 
-    result = _process_yaml_value(yaml_doc, variables, context=[])
+    if disable_features is not None:
+        disable_features = frozenset(disable_features)
+    else:
+        disable_features = frozenset([])
+
+    result = _process_yaml_value(
+        yaml_doc, variables, context=[], disable_features=disable_features
+    )
 
     if outfile is not None:
         yaml.dump(result, outfile)

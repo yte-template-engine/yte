@@ -7,8 +7,10 @@ import subprocess as sp
 from yte.utils import YteError
 
 
-def _process(yaml_str):
-    return yte.process_yaml(textwrap.dedent(yaml_str))
+def _process(yaml_str, disable_features=None):
+    return yte.process_yaml(
+        textwrap.dedent(yaml_str), disable_features=disable_features
+    )
 
 
 def test_ifelse():
@@ -241,4 +243,60 @@ def test_conditional_error():
             ?if asdkn:
               "foo"
             """
+        )
+
+
+def test_variables():
+    result = _process(
+        """
+        __variables__:
+          foo: "x"
+          bar: 3
+        
+        ?foo: 1
+        bar: ?bar
+        """
+    )
+    assert result == {"x": 1, "bar": 3}
+
+
+def test_variables_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __variables__:
+              foo: ?some error
+            """
+        )
+
+
+def test_disable_definitions():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __definitions__:
+              - foo = 1
+            """,
+            disable_features=["definitions"],
+        )
+
+
+def test_disable_variables():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __variables__:
+              foo: 1
+            """,
+            disable_features=["variables"],
+        )
+
+
+def test_invalid_variables():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __variables__:
+              - foo: 1
+            """,
         )
