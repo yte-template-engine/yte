@@ -213,3 +213,32 @@ def test_colon_unquoted():
               ?f"{sample}: observations": 1
             """
         )
+
+
+def test_simple_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            ?unknown_var
+            """
+        )
+
+
+def test_definitions_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __definitions__:
+              - blpasd sad
+            """
+        )
+
+
+def test_conditional_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            ?if asdkn:
+              "foo"
+            """
+        )

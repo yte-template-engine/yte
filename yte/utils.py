@@ -76,7 +76,7 @@ def _process_definitions(value, variables, context: list):
             try:
                 exec(item, variables)
             except Exception as e:
-                YteError(e, context)
+                raise YteError(e, context)
     else:
         raise YteError(
             "__definitions__ keyword expects a list of Python statements", context
