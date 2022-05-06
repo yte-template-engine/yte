@@ -1,11 +1,11 @@
 [tool.poetry]
 authors = ["Johannes Köster <johannes.koester@tu-dortmund.de>"]
 description = "A YAML template engine with Python expressions"
-readme = "README.md"
 homepage = "https://github.com/koesterlab/yte"
-repository = "https://github.com/koesterlab/yte"
 license = "MIT"
 name = "yte"
+readme = "README.md"
+repository = "https://github.com/koesterlab/yte"
 version = "1.2.2"
 
 [tool.poetry.dependencies]
@@ -14,8 +14,8 @@ python = ">=3.7"
 pyyaml = "^6.0"
 
 [tool.poetry.dev-dependencies]
-coverage = {extras = ["toml"], version = "^6.3.1"}
 black = "^22.1.0"
+coverage = {extras = ["toml"], version = "^6.3.1"}
 flake8 = "^4.0.1"
 flake8-bugbear = "^22.1.11"
 pytest = "^7.0"
