@@ -107,7 +107,8 @@ foo: true
 __variables__:
   first: foo
   second: 1.5
-  third: ?2 * 3
+  # apart from constant values as defined above, also Python expressions are allowed:
+  third: ?2 * 3 
 
 
 a: ?first
