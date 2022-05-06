@@ -27,7 +27,7 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
             "to be quoted."
         )
 
-    result = _process_yaml_value(yaml_doc, variables)
+    result = _process_yaml_value(yaml_doc, variables, context=[])
 
     if outfile is not None:
         yaml.dump(result, outfile)
