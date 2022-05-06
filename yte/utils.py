@@ -46,6 +46,8 @@ def _process_dict_items(yaml_value, variables):
     for key, value in yaml_value.items():
         if key == "__definitions__":
             _process_definitions(value, variables)
+        elif key == "__variables__":
+            _process_variables(value, variables)
         elif re_for_loop.match(key):
             yield from _process_for_loop(key, value, variables, conditional)
         elif re_if.match(key):
@@ -70,6 +72,16 @@ def _process_definitions(value, variables):
             exec(item, variables)
     else:
         raise ValueError("__definitions__ keyword expects a list of Python statements")
+
+
+def _process_variables(value, variables):
+    if isinstance(value, dict):
+        for name, expr in value.items():
+            variables["name"] = eval(expr, variables)
+    else:
+        raise YteError(
+            "__variables__ keyword expects a map of variable names and values"
+        )
 
 
 def _process_for_loop(key, value, variables, conditional):

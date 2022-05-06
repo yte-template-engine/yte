@@ -4,9 +4,15 @@ import plac
 from yte.utils import _process_yaml_value
 
 
-def process_yaml(file_or_str, outfile=None, variables=None):
+def process_yaml(file_or_str, outfile=None, variables=None, disable_features=None):
     """Process a YAML file or string with YTE,
     returning the processed version.
+
+    # Arguments
+    * file_or_str - file object or string to render
+    * outfile - output file to write to, if None output is returned as string
+    * variables - variables to be available in the template
+    * disable_features - list of features that should be disabled during rendering. Possible values to choose from are ["definitions", "variables"]
     """
     if variables is None:
         variables = dict()

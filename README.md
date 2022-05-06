@@ -93,7 +93,25 @@ foo: 1
 foo: true
 ```
 
-#### Custom definitions
+#### Variable definitions
+
+##### Template
+
+```yaml
+__variables__:
+  someval: "foo"
+  someother: 1.5
+
+key: ?someother
+```
+
+##### Rendered
+
+```yaml
+key: 1.5
+```
+
+#### Arbitrary definitions
 
 ##### Template
 
