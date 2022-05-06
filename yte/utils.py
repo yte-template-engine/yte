@@ -6,13 +6,16 @@ re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
 
-def _process_yaml_value(yaml_value, variables: dict):
+def _process_yaml_value(yaml_value, variables: dict, context: list):
     if isinstance(yaml_value, dict):
-        return _process_dict(yaml_value, variables)
+        return _process_dict(yaml_value, variables, list(context))
     elif isinstance(yaml_value, list):
-        return [_process_yaml_value(item, variables) for item in yaml_value]
+        return [_process_yaml_value(item, variables, context) for item in yaml_value]
     elif _is_expr(yaml_value):
-        return eval(yaml_value[1:], variables)
+        try:
+            return eval(yaml_value[1:], variables)
+        except Exception as e:
+            raise YteError(e, context)
     else:
         return yaml_value
 
@@ -21,8 +24,8 @@ def _is_expr(yaml_value):
     return isinstance(yaml_value, str) and yaml_value.startswith("?")
 
 
-def _process_dict(yaml_value, variables):
-    items = list(_process_dict_items(yaml_value, variables))
+def _process_dict(yaml_value, variables, context: list):
+    items = list(_process_dict_items(yaml_value, variables, context))
     if all(isinstance(item, dict) for item in items):
         result = dict()
         for item in items:
@@ -33,75 +36,84 @@ def _process_dict(yaml_value, variables):
     elif len(items) == 1:
         return items[0]
     else:
-
-        raise ValueError(
+        raise YteError(
             "Conditional or for loop did not consistently return map or list. "
-            f"Returned: {items}"
+            f"Returned: {items}",
+            context,
         )
 
 
-def _process_dict_items(yaml_value, variables):
+def _process_dict_items(yaml_value, variables, context: list):
     conditional = Conditional()
 
     for key, value in yaml_value.items():
+        key_context = context + [key]
         if key == "__definitions__":
-            _process_definitions(value, variables)
+            _process_definitions(value, variables, key_context)
         elif re_for_loop.match(key):
-            yield from _process_for_loop(key, value, variables, conditional)
+            yield from _process_for_loop(
+                key, value, variables, conditional, key_context
+            )
         elif re_if.match(key):
-            yield from _process_if(key, value, variables, conditional)
+            yield from _process_if(key, value, variables, conditional, key_context)
         elif re_elif.match(key):
-            _process_elif(key, value, variables, conditional)
+            _process_elif(key, value, variables, conditional, key_context)
         elif re_else.match(key):
-            yield from _process_else(value, variables, conditional)
+            yield from _process_else(value, variables, conditional, key_context)
         else:
-            yield from conditional.process_conditional(variables)
+            yield from conditional.process_conditional(variables, key_context)
             yield {
-                _process_yaml_value(key, variables): _process_yaml_value(
-                    value, variables
+                _process_yaml_value(key, variables, key_context): _process_yaml_value(
+                    value, variables, key_context
                 )
             }
-    yield from conditional.process_conditional(variables)
+    yield from conditional.process_conditional(variables, key_context)
 
 
-def _process_definitions(value, variables):
+def _process_definitions(value, variables, context: list):
     if isinstance(value, list):
         for item in value:
-            exec(item, variables)
+            try:
+                exec(item, variables)
+            except Exception as e:
+                YteError(e, context)
     else:
-        raise ValueError("__definitions__ keyword expects a list of Python statements")
+        raise YteError(
+            "__definitions__ keyword expects a list of Python statements", context
+        )
 
 
-def _process_for_loop(key, value, variables, conditional):
-    yield from conditional.process_conditional(variables)
+def _process_for_loop(key, value, variables, conditional, context: list):
+    yield from conditional.process_conditional(variables, context)
     _variables = dict(variables)
     _variables["_yte_value"] = value
+    _variables["_context"] = context
     _variables["_yte_variables"] = _variables
     yield from eval(
-        f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals())) "
+        f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals()), _context) "
         f"{key[1:]}]",
         _variables,
     )
 
 
-def _process_if(key, value, variables, conditional):
-    yield from conditional.process_conditional(variables)
+def _process_if(key, value, variables, conditional, context: list):
+    yield from conditional.process_conditional(variables, context)
     expr = re_if.match(key).group("expr")
     conditional.register_if(expr, value)
 
 
-def _process_elif(key, value, variables, conditional):
+def _process_elif(key, value, variables, conditional, context: list):
     if conditional.is_empty():
-        raise ValueError("Unexpected elif: no if or elif before")
+        raise YteError("Unexpected elif: no if or elif before", context)
     expr = re_elif.match(key).group("expr")
     conditional.register_if(expr, value)
 
 
-def _process_else(value, variables, conditional):
+def _process_else(value, variables, conditional, context: list):
     if conditional.is_empty():
-        raise ValueError("Unexpected else: no if or elif before")
+        raise YteError("Unexpected else: no if or elif before", context)
     conditional.register_else(value)
-    yield from conditional.process_conditional(variables)
+    yield from conditional.process_conditional(variables, context)
 
 
 class Conditional:
@@ -109,12 +121,16 @@ class Conditional:
         self.exprs = []
         self.values = []
 
-    def process_conditional(self, variables):
+    def process_conditional(self, variables, context: list):
         if not self.is_empty():
             variables = dict(variables)
             variables.update(self.value_dict)
             variables["_yte_variables"] = variables
-            result = eval(self.conditional_expr(), variables)
+            variables["_context"] = context
+            try:
+                result = eval(self.conditional_expr(), variables)
+            except Exception as e:
+                raise YteError(e, context)
             if result is not None:
                 yield result
             self.exprs.clear()
@@ -123,11 +139,11 @@ class Conditional:
     def conditional_expr(self, index=0):
         if index < len(self.exprs):
             return (
-                f"_process_yaml_value({self.value_name(index)}, _yte_variables) "
+                f"_process_yaml_value({self.value_name(index)}, _yte_variables, _context) "
                 f"if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
             )
         if index < len(self.values):
-            return f"_process_yaml_value({self.value_name(index)}, _yte_variables)"
+            return f"_process_yaml_value({self.value_name(index)}, _yte_variables, _context)"
         else:
             return "None"
 
@@ -147,3 +163,9 @@ class Conditional:
 
     def value_name(self, index):
         return f"_yte_value_{index}"
+
+
+class YteError(Exception):
+    def __init__(self, msg, context):
+        section = "in section /" + "/".join(context) if context else "at top level"
+        super().__init__(f"Error processing template {section}: {msg}")
