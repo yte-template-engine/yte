@@ -4,6 +4,8 @@ import pytest
 import yaml
 import subprocess as sp
 
+from yte.utils import YteError
+
 
 def _process(yaml_str):
     return yte.process_yaml(textwrap.dedent(yaml_str))
@@ -61,7 +63,7 @@ def test_if_list():
 
 
 def test_fail_mixed_loop_return():
-    with pytest.raises(ValueError):
+    with pytest.raises(YteError):
         _process(
             """
             ?for i in range(2):
@@ -74,7 +76,7 @@ def test_fail_mixed_loop_return():
 
 
 def test_unexpected_elif():
-    with pytest.raises(ValueError):
+    with pytest.raises(YteError):
         _process(
             """
             ?elif True:
@@ -84,7 +86,7 @@ def test_unexpected_elif():
 
 
 def test_unexpected_else():
-    with pytest.raises(ValueError):
+    with pytest.raises(YteError):
         _process(
             """
             ?else:
@@ -154,7 +156,7 @@ def test_variable_definition3():
 
 
 def test_custom_import_syntax_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(YteError):
         _process(
             """
           __definitions__:
@@ -209,5 +211,34 @@ def test_colon_unquoted():
             """
             ?for sample in ["normal", "tumor"]:
               ?f"{sample}: observations": 1
+            """
+        )
+
+
+def test_simple_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            ?unknown_var
+            """
+        )
+
+
+def test_definitions_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            __definitions__:
+              - blpasd sad
+            """
+        )
+
+
+def test_conditional_error():
+    with pytest.raises(YteError):
+        _process(
+            """
+            ?if asdkn:
+              "foo"
             """
         )
