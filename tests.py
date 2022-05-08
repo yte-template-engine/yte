@@ -1,3 +1,4 @@
+import tempfile
 import yte
 import textwrap
 import pytest
@@ -7,9 +8,11 @@ import subprocess as sp
 from yte.utils import YteError
 
 
-def _process(yaml_str, disable_features=None):
+def _process(yaml_str, outfile=None, disable_features=None):
     return yte.process_yaml(
-        textwrap.dedent(yaml_str), disable_features=disable_features
+        textwrap.dedent(yaml_str),
+        outfile=outfile,
+        disable_features=disable_features,
     )
 
 
@@ -214,6 +217,16 @@ def test_colon_unquoted():
             ?for sample in ["normal", "tumor"]:
               ?f"{sample}: observations": 1
             """
+        )
+
+
+def test_outfile():
+    with tempfile.NamedTemporaryFile(mode="w") as tmp:
+        _process(
+            """
+            foo
+            """,
+            outfile=tmp,
         )
 
 

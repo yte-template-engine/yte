@@ -38,7 +38,7 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
     )
 
     if outfile is not None:
-        yaml.dump(result, outfile)
+        yaml.dump(result, outfile, sort_keys=False)
     else:
         return result
 

@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.2.3](https://www.github.com/koesterlab/yte/compare/v1.2.2...v1.2.3) (2022-05-06)
+
+
+### Bug Fixes
+
+* display error context ([#17](https://www.github.com/koesterlab/yte/issues/17)) ([cbe74a3](https://www.github.com/koesterlab/yte/commit/cbe74a357be3449bbb8e0325f1e87ec6469a4b3b))
+
+
+### Documentation
+
+* add example and testcase for variable definition ([#15](https://www.github.com/koesterlab/yte/issues/15)) ([818f886](https://www.github.com/koesterlab/yte/commit/818f886b9c44f2bd15fe5e0f32119c0c3ace3ca1))
+
 ### [1.2.2](https://www.github.com/koesterlab/yte/compare/v1.2.1...v1.2.2) (2022-04-12)
 
 
