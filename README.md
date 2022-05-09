@@ -117,13 +117,19 @@ c:
   ?for x in range(3):
     __variables__:
       y: ?x * 2
-    - ?y
+    ?if True:  
+      - ?y
 ```
 
 ##### Rendered
 
 ```yaml
-key: 1.5
+a: foo
+b: 1.5
+c:
+- 0
+- 2
+- 4
 ```
 
 #### Arbitrary definitions
