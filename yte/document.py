@@ -8,7 +8,13 @@ class Subdocument:
         self.inner = dict()
 
     def __getitem__(self, key):
-        return self.inner[key]
+        try:
+            return self.inner[key]
+        except KeyError as e:
+            try:
+                return self.dpath_get(key)
+            except KeyError:
+                raise e
 
     def __setitem__(self, key, value):
         self.inner[key] = value

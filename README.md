@@ -98,7 +98,8 @@ foo: true
 A globally available object `doc` (a wrapper around a Python dict)
 enables to access parts of the document that have already been rendered above.
 This way, one can often avoid variable definitions (see below).
-In addition to normal dict access, the object allows to search (`doc.dpath_search`) and access (`doc.dpath_access`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries.
+In addition to normal dict access, the object allows to search (`doc.dpath_search`) and access (`doc.dpath_get`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries.
+Simple dpath get queries can also be performed by putting the dpath query directly into the square bracket operator of the `doc` object (the logic in that case is as follows: first, the given value is tried as plain key, if that fails, `doc.dpath_get` is tried as a fallback); see example below.
 
 ##### Template
 
@@ -106,8 +107,12 @@ In addition to normal dict access, the object allows to search (`doc.dpath_searc
 foo: 1
 bar:
   a: 2
+  # dict access
   b: ?doc["foo"] + doc["bar"]["a"]
-  c: ?doc.dpath_get("foo") + doc.dpath_get("bar/a")
+  # implicit simple dpath get query
+  c: ?doc["bar/a"]
+  # explicit dpath queries
+  d: ?doc.dpath_get("foo") + doc.dpath_get("bar/a")
 ```
 
 ##### Rendered
@@ -117,6 +122,7 @@ foo: 1
 bar:
   a: 2
   b: 3
+  c: 2
   c: 3
 ```
 
