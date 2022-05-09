@@ -20,7 +20,7 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 
 ### Conditionals
 
-<div class="example">
+<span class="example">
 
 #### Template
 
@@ -39,7 +39,7 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 foo: 1
 ```
 
-</div>
+</span>
 
 #### Template
 
