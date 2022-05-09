@@ -203,16 +203,7 @@ The usage of `__definitions__` can be disabled via the API.
 
 ## Usage
 
-### Command line interface
-
-YTE comes with a command line interface.
-To render any YTE template, just issue
-
-```bash
-yte < the-template.yaml > the-rendered-version.yaml
-```
-
-## Python API
+### Python API
 
 Alternatively, you can invoke YTE via its Python API:
 
@@ -250,7 +241,7 @@ with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables, disable_features=["variables", "definitions"])
 ```
 
-## Command line interface
+### Command line interface
 
 YTE also provides a command line interface:
 
