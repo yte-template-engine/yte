@@ -116,10 +116,11 @@ def _process_dict_items(
             key_result = _process_yaml_value(
                 key, variables, key_context, disable_features
             )
+            key_context.rendered.append(key_result)
+
             value_result = _process_yaml_value(
                 value, variables, key_context, disable_features
             )
-            key_context.rendered.append(key_result)
             variables["doc"]._insert(key_context, value_result)
 
             yield {key_result: value_result}

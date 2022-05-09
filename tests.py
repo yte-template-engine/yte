@@ -5,7 +5,7 @@ import pytest
 import yaml
 import subprocess as sp
 from yte.context import Context
-from yte.document import Document
+from yte.document import Document, Subdocument
 
 from yte.exceptions import YteError
 
@@ -322,17 +322,18 @@ def test_doc_object():
         """
         foo: 1
         other:
-          bar: ?doc["foo"]
+          some: 2
+          bar: ?doc["foo"] + doc["other"]["some"]
         ?f"yetanother-{doc['foo']}": 2
-        other-items: ?list(doc["other"].items())
+        other-items: ?sorted(doc["other"].items())
         """
     )
 
     assert result == {
         "foo": 1,
-        "other": {"bar": 1},
+        "other": {"some": 2, "bar": 3},
         "yetanother-1": 2,
-        "other-items": [("bar", 1)],
+        "other-items": [("bar", 3), ("some", 2)],
     }
 
 
@@ -340,6 +341,14 @@ def test_doc_object():
 def dummy_document():
     doc = Document()
     doc.inner.inner["foo"] = "bar"
+    return doc
+
+
+@pytest.fixture
+def dummy_document_complex():
+    doc = Document()
+    doc.inner.inner["foo"] = Subdocument()
+    doc.inner.inner["foo"].inner = {"bar": 1}
     return doc
 
 
@@ -371,3 +380,11 @@ def test_doc_eq(dummy_document):
     assert dummy_document == dummy_document
     assert dummy_document == {"foo": "bar"}
     assert dummy_document != 1
+
+
+def test_doc_dpath_get(dummy_document_complex):
+    assert dummy_document_complex.dpath_get("foo/bar") == 1
+
+
+def test_doc_dpath_search(dummy_document_complex):
+    assert dummy_document_complex.dpath_search("foo/bar") == {"foo": {"bar": 1}}

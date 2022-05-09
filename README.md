@@ -93,6 +93,33 @@ foo: 1
 foo: true
 ```
 
+#### Accessing already rendered document parts
+
+A globally available object `doc` (a wrapper around a Python dict)
+enables to access parts of the document that have already been rendered above.
+This way, one can often avoid variable definitions (see below).
+In addition to normal dict access, the object allows to search (`doc.dpath_search`) and access (`doc.dpath_access`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries.
+
+##### Template
+
+```yaml
+foo: 1
+bar:
+  a: 2
+  b: ?doc["foo"] + doc["bar"]["a"]
+  c: ?doc.dpath_get("foo") + doc.dpath_get("bar/a")
+```
+
+##### Rendered
+
+```yaml
+foo: 1
+bar:
+  a: 2
+  b: 3
+  c: 3
+```
+
 #### Variable definitions
 
 ##### Template

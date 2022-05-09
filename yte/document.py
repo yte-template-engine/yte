@@ -1,4 +1,6 @@
 from yte.context import Context
+from dpath.util import get as dpath_get
+from dpath.util import search as dpath_search
 
 
 class Subdocument:
@@ -8,7 +10,7 @@ class Subdocument:
     def __getitem__(self, key):
         return self.inner[key]
 
-    def _insert(self, key, value):
+    def __setitem__(self, key, value):
         self.inner[key] = value
 
     def items(self):
@@ -16,6 +18,12 @@ class Subdocument:
 
     def keys(self):
         return self.inner.keys()
+
+    def dpath_get(self, glob, separator="/"):
+        return dpath_get(self.inner, glob, separator=separator)
+
+    def dpath_search(self, glob, yielded=False):
+        return dpath_search(self.inner, glob, yielded=yielded)
 
     def __contains__(self, key):
         return key in self.inner
@@ -49,7 +57,7 @@ class Document(Subdocument):
         inner = self.inner
         for key in context.rendered[:-1]:
             if key not in inner:
-                inner._insert(key, Subdocument())
+                inner[key] = Subdocument()
             inner = inner[key]
 
-        inner._insert(context.rendered[-1], value)
+        inner[context.rendered[-1]] = value
