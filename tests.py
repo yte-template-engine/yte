@@ -388,3 +388,12 @@ def test_doc_dpath_get(dummy_document_complex):
 
 def test_doc_dpath_search(dummy_document_complex):
     assert dummy_document_complex.dpath_search("foo/bar") == {"foo": {"bar": 1}}
+
+
+def test_doc_dpath_fallback(dummy_document_complex):
+    assert dummy_document_complex["foo/bar"] == 1
+
+
+def test_doc_dpath_fallback_key_error(dummy_document_complex):
+    with pytest.raises(KeyError):
+        dummy_document_complex["some"]
