@@ -199,6 +199,7 @@ The usage of `__definitions__` can be disabled via the API.
 - 2-b
 - 4
 - someval: 2
+```
 
 ## Usage
 
