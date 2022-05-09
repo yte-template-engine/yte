@@ -33,9 +33,9 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 
 #### Rendered
 
-```yaml
-foo: 1
-```
+> ```yaml
+> foo: 1
+> ```
 
 #### Template
 
