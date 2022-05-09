@@ -1,7 +1,6 @@
 import re
 from yte.context import Context
 
-from yte.document import Document
 from yte.exceptions import YteError
 
 re_for_loop = re.compile(r"^\?for .+ in .+$")
