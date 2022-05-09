@@ -1,7 +1,9 @@
 import sys
 import yaml
 import plac
-from yte.utils import _process_yaml_value
+from yte.context import Context
+from yte.process import _process_yaml_value
+from yte.document import Document
 
 
 def process_yaml(file_or_str, outfile=None, variables=None, disable_features=None):
@@ -18,6 +20,7 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
     if variables is None:
         variables = dict()
     variables["_process_yaml_value"] = _process_yaml_value
+    variables["doc"] = Document()
 
     try:
         yaml_doc = yaml.load(file_or_str, Loader=yaml.FullLoader)
@@ -34,7 +37,7 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
         disable_features = frozenset([])
 
     result = _process_yaml_value(
-        yaml_doc, variables, context=[], disable_features=disable_features
+        yaml_doc, variables, context=Context(), disable_features=disable_features
     )
 
     if outfile is not None:

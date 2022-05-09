@@ -1,4 +1,7 @@
 import re
+from yte.context import Context
+
+from yte.exceptions import YteError
 
 re_for_loop = re.compile(r"^\?for .+ in .+$")
 re_if = re.compile(r"^\?if (?P<expr>.+)$")
@@ -7,15 +10,17 @@ re_else = re.compile(r"^\?else$")
 
 
 def _process_yaml_value(
-    yaml_value, variables: dict, context: list, disable_features: frozenset
+    yaml_value,
+    variables: dict,
+    context: Context,
+    disable_features: frozenset,
 ):
     if isinstance(yaml_value, dict):
-        return _process_dict(yaml_value, variables, list(context), disable_features)
+        return _process_dict(yaml_value, variables, Context(context), disable_features)
     elif isinstance(yaml_value, list):
-        return [
-            _process_yaml_value(item, variables, context, disable_features)
-            for item in yaml_value
-        ]
+        result = _process_list(yaml_value, variables, context, disable_features)
+        variables["doc"]._insert(context, result)
+        return result
     elif _is_expr(yaml_value):
         return _process_expr(yaml_value, variables, context)
     else:
@@ -26,14 +31,31 @@ def _is_expr(yaml_value):
     return isinstance(yaml_value, str) and yaml_value.startswith("?")
 
 
-def _process_expr(yaml_value, variables, context: list):
+def _process_expr(yaml_value, variables, context: Context):
     try:
         return eval(yaml_value[1:], variables)
     except Exception as e:
         raise YteError(e, context)
 
 
-def _process_dict(yaml_value, variables, context: list, disable_features: frozenset):
+def _process_list(
+    yaml_value,
+    variables,
+    context: Context,
+    disable_features: frozenset,
+):
+    return [
+        _process_yaml_value(item, variables, context, disable_features)
+        for item in yaml_value
+    ]
+
+
+def _process_dict(
+    yaml_value,
+    variables,
+    context: Context,
+    disable_features: frozenset,
+):
     items = list(_process_dict_items(yaml_value, variables, context, disable_features))
     if all(isinstance(item, dict) for item in items):
         result = dict()
@@ -53,12 +75,16 @@ def _process_dict(yaml_value, variables, context: list, disable_features: frozen
 
 
 def _process_dict_items(
-    yaml_value, variables, context: list, disable_features: frozenset
+    yaml_value,
+    variables,
+    context: Context,
+    disable_features: frozenset,
 ):
     conditional = Conditional()
 
     for key, value in yaml_value.items():
-        key_context = context + [key]
+        key_context = Context(context)
+        key_context.template.append(key)
         if key == "__definitions__":
             if "definitions" in disable_features:
                 raise YteError("__definitions__ have been disabled", key_context)
@@ -82,18 +108,25 @@ def _process_dict_items(
                 value, variables, conditional, key_context, disable_features
             )
         else:
+            # a normal key that will end up in the result
             yield from conditional.process_conditional(
                 variables, key_context, disable_features
             )
-            yield {
-                _process_yaml_value(
-                    key, variables, key_context, disable_features
-                ): _process_yaml_value(value, variables, key_context, disable_features)
-            }
+            key_result = _process_yaml_value(
+                key, variables, key_context, disable_features
+            )
+            key_context.rendered.append(key_result)
+
+            value_result = _process_yaml_value(
+                value, variables, key_context, disable_features
+            )
+            variables["doc"]._insert(key_context, value_result)
+
+            yield {key_result: value_result}
     yield from conditional.process_conditional(variables, key_context, disable_features)
 
 
-def _process_definitions(value, variables, context: list):
+def _process_definitions(value, variables, context: Context):
     if isinstance(value, list):
         for item in value:
             try:
@@ -106,7 +139,7 @@ def _process_definitions(value, variables, context: list):
         )
 
 
-def _process_variables(value, variables, context: list):
+def _process_variables(value, variables, context: Context):
     if isinstance(value, dict):
         for name, val in value.items():
             if _is_expr(val):
@@ -119,7 +152,7 @@ def _process_variables(value, variables, context: list):
 
 
 def _process_for_loop(
-    key, value, variables, conditional, context: list, disable_features: frozenset
+    key, value, variables, conditional, context: Context, disable_features: frozenset
 ):
     yield from conditional.process_conditional(variables, context, disable_features)
     _variables = dict(variables)
@@ -136,14 +169,14 @@ def _process_for_loop(
 
 
 def _process_if(
-    key, value, variables, conditional, context: list, disable_features: frozenset
+    key, value, variables, conditional, context: Context, disable_features: frozenset
 ):
     yield from conditional.process_conditional(variables, context, disable_features)
     expr = re_if.match(key).group("expr")
     conditional.register_if(expr, value)
 
 
-def _process_elif(key, value, variables, conditional, context: list):
+def _process_elif(key, value, variables, conditional, context: Context):
     if conditional.is_empty():
         raise YteError("Unexpected elif: no if or elif before", context)
     expr = re_elif.match(key).group("expr")
@@ -151,7 +184,7 @@ def _process_elif(key, value, variables, conditional, context: list):
 
 
 def _process_else(
-    value, variables, conditional, context: list, disable_features: frozenset
+    value, variables, conditional, context: Context, disable_features: frozenset
 ):
     if conditional.is_empty():
         raise YteError("Unexpected else: no if or elif before", context)
@@ -165,7 +198,7 @@ class Conditional:
         self.values = []
 
     def process_conditional(
-        self, variables, context: list, disable_features: frozenset
+        self, variables, context: Context, disable_features: frozenset
     ):
         if not self.is_empty():
             variables = dict(variables)
@@ -213,9 +246,3 @@ class Conditional:
 
     def value_name(self, index):
         return f"_yte_value_{index}"
-
-
-class YteError(Exception):
-    def __init__(self, msg, context):
-        section = "in section /" + "/".join(context) if context else "at top level"
-        super().__init__(f"Error processing template {section}: {msg}")
