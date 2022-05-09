@@ -1,5 +1,6 @@
 # YTE - A YAML template engine with Python expressions
 
+[![Docs](https://img.shields.io/badge/user-documentation-green)](https://koesterlab.github.io/yte)
 [![test coverage: 100%](https://img.shields.io/badge/test%20coverage-100%25-green)](https://github.com/koesterlab/yte/blob/main/pyproject.toml#L30)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/koesterlab/yte/CI)
 ![PyPI](https://img.shields.io/pypi/v/yte)
