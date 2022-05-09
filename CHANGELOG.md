@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/koesterlab/yte/compare/v1.3.0...v1.3.1) (2022-05-09)
+
+
+### Documentation
+
+* CLI and formatting ([e21512d](https://www.github.com/koesterlab/yte/commit/e21512d1a71761f9078a6abf8ea2b4708fe5caf0))
+
 ## [1.3.0](https://www.github.com/koesterlab/yte/compare/v1.2.3...v1.3.0) (2022-05-09)
 
 
