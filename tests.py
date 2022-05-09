@@ -4,8 +4,10 @@ import textwrap
 import pytest
 import yaml
 import subprocess as sp
+from yte.context import Context
+from yte.document import Document
 
-from yte.utils import YteError
+from yte.exceptions import YteError
 
 
 def _process(yaml_str, outfile=None, disable_features=None):
@@ -313,3 +315,59 @@ def test_invalid_variables():
               - foo: 1
             """,
         )
+
+
+def test_doc_object():
+    result = _process(
+        """
+        foo: 1
+        other:
+          bar: ?doc["foo"]
+        ?f"yetanother-{doc['foo']}": 2
+        other-items: ?list(doc["other"].items())
+        """
+    )
+
+    assert result == {
+        "foo": 1,
+        "other": {"bar": 1},
+        "yetanother-1": 2,
+        "other-items": [("bar", 1)],
+    }
+
+
+@pytest.fixture
+def dummy_document():
+    doc = Document()
+    doc.inner.inner["foo"] = "bar"
+    return doc
+
+
+def test_doc_items(dummy_document):
+    assert list(dummy_document.items()) == [("foo", "bar")]
+
+
+def test_doc_keys(dummy_document):
+    assert list(dummy_document.keys()) == ["foo"]
+
+
+def test_doc_len(dummy_document):
+    assert len(dummy_document) == 1
+
+
+def test_doc_repr(dummy_document):
+    assert repr(dummy_document) == "{'foo': 'bar'}"
+
+
+def test_doc_insert():
+    dummy_document = Document()
+    context = Context()
+    context.rendered += ["foo", "bar"]
+    dummy_document._insert(context, 1)
+    assert dummy_document == {"foo": {"bar": 1}}
+
+
+def test_doc_eq(dummy_document):
+    assert dummy_document == dummy_document
+    assert dummy_document == {"foo": "bar"}
+    assert dummy_document != 1
