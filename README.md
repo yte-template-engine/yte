@@ -17,11 +17,9 @@ Python expressions are thereby declared by prepending them with a `?` anywhere i
 Any such value will be automatically evaluated by YTE, yielding plain YAML as a result.
 Importantly, YTE templates are still valid YAML files (for YAML, the `?` expressions are just strings).
 
-### Examples
+### Conditionals
 
-#### Conditionals
-
-##### Template
+#### Template
 
 ```yaml
 ?if True:
@@ -32,13 +30,13 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
   bar: 1
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 foo: 1
 ```
 
-##### Template
+#### Template
 
 ```yaml
 ?if True:
@@ -46,14 +44,14 @@ foo: 1
   - b
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 - a
 - b
 ```
 
-##### Template
+#### Template
 
 ```yaml
 - foo
@@ -64,7 +62,7 @@ foo: 1
     bar
 ```
 
-##### Rendered
+#### Rendered
 
 
 ```yaml
@@ -74,9 +72,9 @@ foo: 1
 ```
 
 
-#### Loops
+### Loops
 
-##### Template
+#### Template
 
 ```yaml
 ?for i in range(2):
@@ -85,7 +83,7 @@ foo: 1
       foo: true
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 "key:0": 1
@@ -93,7 +91,7 @@ foo: 1
 foo: true
 ```
 
-#### Accessing already rendered document parts
+### Accessing already rendered document parts
 
 A globally available object `doc` (a wrapper around a Python dict)
 enables to access parts of the document that have already been rendered above.
@@ -101,7 +99,7 @@ This way, one can often avoid variable definitions (see below).
 In addition to normal dict access, the object allows to search (`doc.dpath_search`) and access (`doc.dpath_get`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries.
 Simple dpath get queries can also be performed by putting the dpath query directly into the square bracket operator of the `doc` object (the logic in that case is as follows: first, the given value is tried as plain key, if that fails, `doc.dpath_get` is tried as a fallback); see example below.
 
-##### Template
+#### Template
 
 ```yaml
 foo: 1
@@ -115,7 +113,7 @@ bar:
   d: ?doc.dpath_get("foo") + doc.dpath_get("bar/a")
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 foo: 1
@@ -126,17 +124,17 @@ bar:
   c: 3
 ```
 
-#### Variable definitions
+### Variable definitions
 
-##### Template
+The special keyword `__variables__` allows to define variables that can be reused below.
+It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
+with the restriction of not having duplicate `__variables__` keys on the same level.
+
+The usage of `__variables__` can be disabled via the API.
+
+#### Template
 
 ```yaml
-# The special keyword __variables__ allows to define variables that can be reused below.
-# It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
-# with the restriction of not having duplicate __variables__ keys on the same level.
-
-# The usage of __variables__ can be disabled via the API.
-
 __variables__:
   first: foo
   second: 1.5
@@ -154,7 +152,7 @@ c:
       - ?y
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 a: foo
@@ -165,17 +163,17 @@ c:
 - 4
 ```
 
-#### Arbitrary definitions
+### Arbitrary definitions
 
-##### Template
+The special keyword `__definitions__` allows to define custom statements.
+It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
+with the restriction of not having duplicate `__definitions__` keys on the same level.
+
+The usage of `__definitions__` can be disabled via the API.
+
+#### Template
 
 ```yaml
-  # The special keyword __definitions__ allows to define custom statements.
-  # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
-  # with the restriction of not having duplicate __definitions__ keys on the same level.
-
-  # The usage of __definitions__ can be disabled via the API.
-
   __definitions__:
     - from itertools import product
     - someval = 2
@@ -191,7 +189,7 @@ c:
     - someval: ?someval
 ```
 
-##### Rendered
+#### Rendered
 
 ```yaml
 - 1-a
@@ -212,7 +210,7 @@ To render any YTE template, just issue
 yte < the-template.yaml > the-rendered-version.yaml
 ```
 
-### Python API
+## Python API
 
 Alternatively, you can invoke YTE via its Python API:
 
@@ -248,6 +246,20 @@ with open("the-template.yaml", "r") as template:
 # render a file while disabling the __variables__ and __definitions__ feature
 with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables, disable_features=["variables", "definitions"])
+```
+
+## Command line interface
+
+YTE also provides a command line interface:
+
+```bash
+yte --help
+```
+
+It can be used to process a YTE template from STDIN and prints the rendered version to STDOUT:
+
+```bash
+yte < template.yaml > rendered.yaml
 ```
 
 ## Comparison with other engines
