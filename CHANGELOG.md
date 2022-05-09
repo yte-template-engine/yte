@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/koesterlab/yte/compare/v1.2.3...v1.3.0) (2022-05-09)
+
+
+### Features
+
+* enable access to already rendered parts of the document via a global variable `doc` ([#23](https://www.github.com/koesterlab/yte/issues/23)) ([a2ac30a](https://www.github.com/koesterlab/yte/commit/a2ac30a6c97124bc4a57405877832b48b1a8bb4f))
+* variable definitions as an alternative to full Python definitions ([#19](https://www.github.com/koesterlab/yte/issues/19)) ([c1f4b1c](https://www.github.com/koesterlab/yte/commit/c1f4b1ceacd662db33c2e55968c9f402724adbe1))
+
+
+### Documentation
+
+* Fix README.md example ([#22](https://www.github.com/koesterlab/yte/issues/22)) ([0247fe2](https://www.github.com/koesterlab/yte/commit/0247fe229a6c38940f485bcce18f51a6dea72551))
+
 ### [1.2.3](https://www.github.com/koesterlab/yte/compare/v1.2.2...v1.2.3) (2022-05-06)
 
 
