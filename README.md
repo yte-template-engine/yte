@@ -20,6 +20,7 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 
 ### Conditionals
 
+<div class="example">
 #### Template
 
 ```yaml
@@ -36,6 +37,7 @@ Importantly, YTE templates are still valid YAML files (for YAML, the `?` express
 ```yaml
 foo: 1
 ```
+</div>
 
 #### Template
 
