@@ -93,7 +93,40 @@ foo: 1
 foo: true
 ```
 
-#### Custom definitions
+#### Variable definitions
+
+##### Template
+
+```yaml
+# The special keyword __variables__ allows to define variables that can be reused below.
+# It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
+# with the restriction of not having duplicate __variables__ keys on the same level.
+
+# The usage of __variables__ can be disabled via the API.
+
+__variables__:
+  first: foo
+  second: 1.5
+  # apart from constant values as defined above, also Python expressions are allowed:
+  third: ?2 * 3 
+
+
+a: ?first
+b: ?second
+c:
+  ?for x in range(3):
+    __variables__:
+      y: ?x * 2
+    - ?y
+```
+
+##### Rendered
+
+```yaml
+key: 1.5
+```
+
+#### Arbitrary definitions
 
 ##### Template
 
@@ -101,6 +134,9 @@ foo: true
   # The special keyword __definitions__ allows to define custom statements.
   # It can be used anywhere in the YAML, also repeatedly and inside of ifs or loops
   # with the restriction of not having duplicate __definitions__ keys on the same level.
+
+  # The usage of __definitions__ can be disabled via the API.
+
   __definitions__:
     - from itertools import product
     - someval = 2
@@ -160,6 +196,19 @@ with open("the-template.yaml", "r") as template:
 # render a file and write the result as valid YAML
 with open("the-template.yaml", "r") as template, open("the-rendered-version.yaml", "w") as outfile:
     result = process_yaml(template, outfile=outfile, variables=variables)
+
+
+# render a file while disabling the __definitions__ feature
+with open("the-template.yaml", "r") as template:
+    result = process_yaml(template, variables=variables, disable_features=["definitions"])
+
+# render a file while disabling the __variables__ feature
+with open("the-template.yaml", "r") as template:
+    result = process_yaml(template, variables=variables, disable_features=["variables"])
+
+# render a file while disabling the __variables__ and __definitions__ feature
+with open("the-template.yaml", "r") as template:
+    result = process_yaml(template, variables=variables, disable_features=["variables", "definitions"])
 ```
 
 ## Comparison with other engines
