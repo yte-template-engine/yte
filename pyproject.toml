@@ -1,11 +1,11 @@
 [tool.poetry]
 authors = ["Johannes Köster <johannes.koester@tu-dortmund.de>"]
 description = "A YAML template engine with Python expressions"
-homepage = "https://github.com/koesterlab/yte"
+homepage = "https://github.com/yte-template-engine/yte"
 license = "MIT"
 name = "yte"
 readme = "README.md"
-repository = "https://github.com/koesterlab/yte"
+repository = "https://github.com/yte-template-engine/yte"
 version = "1.4.0"
 
 [tool.poetry.dependencies]
