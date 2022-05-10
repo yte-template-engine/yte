@@ -98,11 +98,11 @@ foo: true
 
 ### Accessing already rendered document parts
 
-A globally available object `doc` (a wrapper around a Python dict)
+A globally available object `this` (a wrapper around a Python dict)
 enables to access parts of the document that have already been rendered above.
 This way, one can often avoid variable definitions (see below).
-In addition to normal dict access, the object allows to search (`doc.dpath_search`) and access (`doc.dpath_get`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries.
-Simple dpath get queries can also be performed by putting the dpath query directly into the square bracket operator of the `doc` object (the logic in that case is as follows: first, the given value is tried as plain key, if that fails, `doc.dpath_get` is tried as a fallback); see example below.
+In addition to normal dict access, the object allows to search (`this.dpath_search`) and access (`this.dpath_get`) its contents via [dpath](https://github.com/dpath-maintainers/dpath-python) queries (see the [dpath docs](https://github.com/dpath-maintainers/dpath-python) for allowed expressions).
+Simple dpath get queries can also be performed by putting the dpath query directly into the square bracket operator of the `doc` object (the logic in that case is as follows: first, the given value is tried as plain key, if that fails, `this.dpath_get` is tried as a fallback); see example below.
 
 #### Template
 
@@ -111,11 +111,11 @@ foo: 1
 bar:
   a: 2
   # dict access
-  b: ?doc["foo"] + doc["bar"]["a"]
+  b: ?this["foo"] + this["bar"]["a"]
   # implicit simple dpath get query
-  c: ?doc["bar/a"]
+  c: ?this["bar/a"]
   # explicit dpath queries
-  d: ?doc.dpath_get("foo") + doc.dpath_get("bar/a")
+  d: ?this.dpath_get("foo") + this.dpath_get("bar/a")
 ```
 
 #### Rendered

@@ -20,7 +20,9 @@ def process_yaml(file_or_str, outfile=None, variables=None, disable_features=Non
     if variables is None:
         variables = dict()
     variables["_process_yaml_value"] = _process_yaml_value
-    variables["doc"] = Document()
+    doc = Document()
+    variables["doc"] = doc
+    variables["this"] = doc
 
     try:
         yaml_doc = yaml.load(file_or_str, Loader=yaml.FullLoader)
