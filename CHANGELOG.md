@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/koesterlab/yte/compare/v1.3.0...v1.4.0) (2022-05-10)
+
+
+### Features
+
+* rename the global doc object into `this` (`doc` remains available as an alias) ([#25](https://www.github.com/koesterlab/yte/issues/25)) ([e3adc67](https://www.github.com/koesterlab/yte/commit/e3adc67094188e5af8000580d4732e7d8fa68a09))
+
+
+### Documentation
+
+* CLI and formatting ([e21512d](https://www.github.com/koesterlab/yte/commit/e21512d1a71761f9078a6abf8ea2b4708fe5caf0))
+
 ## [1.3.0](https://www.github.com/koesterlab/yte/compare/v1.2.3...v1.3.0) (2022-05-09)
 
 
