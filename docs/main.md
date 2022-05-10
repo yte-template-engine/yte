@@ -1,8 +1,8 @@
 # YTE - A YAML template engine with Python expressions
 
-[![Docs](https://img.shields.io/badge/user-documentation-green)](https://koesterlab.github.io/yte)
-[![test coverage: 100%](https://img.shields.io/badge/test%20coverage-100%25-green)](https://github.com/koesterlab/yte/blob/main/pyproject.toml#L30)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/koesterlab/yte/CI)
+[![Docs](https://img.shields.io/badge/user-documentation-green)](https://yte-template-engine.github.io)
+[![test coverage: 100%](https://img.shields.io/badge/test%20coverage-100%25-green)](https://github.com/yte-template-engine/yte/blob/main/pyproject.toml#L30)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/yte-template-engine/yte/CI)
 ![PyPI](https://img.shields.io/pypi/v/yte)
 [![Conda Recipe](https://img.shields.io/badge/recipe-yte-green.svg)](https://anaconda.org/conda-forge/yte)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
@@ -202,6 +202,10 @@ The usage of `__definitions__` can be disabled via the API.
 ```
 
 ## Usage
+
+### Installation
+
+YTE can be installed as a Python package via [PyPi](https://pypi.org/project/yte) or [Conda/Mamba](https://anaconda.org/conda-forge/yte).
 
 ### Python API
 
