@@ -323,9 +323,9 @@ def test_doc_object():
         foo: 1
         other:
           some: 2
-          bar: ?doc["foo"] + doc["other"]["some"]
-        ?f"yetanother-{doc['foo']}": 2
-        other-items: ?sorted(doc["other"].items())
+          bar: ?this["foo"] + this["other"]["some"]
+        ?f"yetanother-{this['foo']}": 2
+        other-items: ?sorted(this["other"].items())
         """
     )
 
