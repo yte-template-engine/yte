@@ -8,6 +8,8 @@ re_if = re.compile(r"^\?if (?P<expr>.+)$")
 re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
+FEATURES = frozenset(["variables", "definitions"])
+
 
 def _process_yaml_value(
     yaml_value,

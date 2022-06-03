@@ -2,7 +2,8 @@ import sys
 import yaml
 import plac
 from yte.context import Context
-from yte.process import _process_yaml_value
+from yte.exceptions import YteError
+from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
 
 
@@ -47,7 +48,10 @@ def process_yaml(
 
     if not require_use_yte or is_use_yte:
         if disable_features is not None:
+
             disable_features = frozenset(disable_features)
+            if not FEATURES.issuperset(disable_features):
+                raise ValueError("Invalid features given to `disable_features`.")
         else:
             disable_features = frozenset([])
 
@@ -67,7 +71,15 @@ def process_yaml(
         return result
 
 
-def cli():
+@plac.flg(
+    "require_use_yte",
+    "Require that the document contains a `__use_yte__: true` statement at the top level. "
+    "If the statement is not present or false, return document unprocessed "
+    "(except removing the `__use_yte__: false` statement if present)",
+)
+def cli(
+    require_use_yte=False,
+):
     """Process a YAML file given at STDIN with YTE,
     and print the result to STDOUT.
 

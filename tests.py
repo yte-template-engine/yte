@@ -308,6 +308,17 @@ def test_disable_variables():
         )
 
 
+def test_disable_invalid_feature():
+    with pytest.raises(ValueError):
+        _process(
+            """
+            __variables__:
+              foo: 1
+            """,
+            disable_features=["bar"],
+        )
+
+
 def test_invalid_variables():
     with pytest.raises(YteError):
         _process(
