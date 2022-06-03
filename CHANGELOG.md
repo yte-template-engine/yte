@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/yte-template-engine/yte/compare/v1.4.0...v1.5.0) (2022-06-03)
+
+
+### Features
+
+* allow to require a __use_yte__ statement when processing ([#27](https://github.com/yte-template-engine/yte/issues/27)) ([abf3d95](https://github.com/yte-template-engine/yte/commit/abf3d95c1a241088f24825606034e35c0600be7b))
+
 ## [1.4.0](https://www.github.com/yte-template-engine/yte/compare/v1.3.0...v1.4.0) (2022-05-10)
 
 
