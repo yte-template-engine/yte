@@ -10,10 +10,11 @@ from yte.document import Document, Subdocument
 from yte.exceptions import YteError
 
 
-def _process(yaml_str, outfile=None, disable_features=None):
+def _process(yaml_str, outfile=None, disable_features=None, require_use_yte=False):
     return yte.process_yaml(
         textwrap.dedent(yaml_str),
         outfile=outfile,
+        require_use_yte=require_use_yte,
         disable_features=disable_features,
     )
 
@@ -397,3 +398,40 @@ def test_doc_dpath_fallback(dummy_document_complex):
 def test_doc_dpath_fallback_key_error(dummy_document_complex):
     with pytest.raises(KeyError):
         dummy_document_complex["some"]
+
+
+def test_require_use_yte():
+    result = _process(
+        """
+    __use_yte__: true
+    ?if True:
+        foo: 1
+    ?else:
+        bar: 1
+    """,
+        require_use_yte=True,
+    )
+    assert result == {"foo": 1}
+
+
+def test_require_use_yte_not_found():
+    result = _process(
+        """
+    ?if True:
+        foo: 1
+    """,
+        require_use_yte=True,
+    )
+    assert result == {"?if True": {"foo": 1}}
+
+
+def test_require_use_yte_false():
+    result = _process(
+        """
+    __use_yte__: false
+    ?if True:
+        foo: 1
+    """,
+        require_use_yte=True,
+    )
+    assert result == {"?if True": {"foo": 1}}
