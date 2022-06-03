@@ -214,35 +214,39 @@ Alternatively, you can invoke YTE via its Python API:
 ```python
 from yte import process_yaml
 
-# set some variables as a Python dictionary
+# Set some variables as a Python dictionary.
 variables = ...
 
-# render a string and obtain the result as a Python dict
+# Render a string and obtain the result as a Python dict.
 result = process_yaml("""
 ?for i in range(10):
   - ?f"item-{i}"
 """, variables=variables)
 
-# render a file and obtain the result as a Python dict
+# Render a file and obtain the result as a Python dict.
 with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables)
 
-# render a file and write the result as valid YAML
+# Render a file and write the result as valid YAML.
 with open("the-template.yaml", "r") as template, open("the-rendered-version.yaml", "w") as outfile:
     result = process_yaml(template, outfile=outfile, variables=variables)
 
-
-# render a file while disabling the __definitions__ feature
+# Render a file while disabling the __definitions__ feature.
 with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables, disable_features=["definitions"])
 
-# render a file while disabling the __variables__ feature
+# Render a file while disabling the __variables__ feature.
 with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables, disable_features=["variables"])
 
-# render a file while disabling the __variables__ and __definitions__ feature
+# Render a file while disabling the __variables__ and __definitions__ feature.
 with open("the-template.yaml", "r") as template:
     result = process_yaml(template, variables=variables, disable_features=["variables", "definitions"])
+
+# Require that the document contains a `__use_yte__: true` statement at the top level.
+# If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present).
+with open("the-template.yaml", "r") as template:
+    result = process_yaml(template, variables=variables, require_use_yte=True)
 ```
 
 ### Command line interface
