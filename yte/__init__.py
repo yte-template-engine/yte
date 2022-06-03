@@ -2,7 +2,6 @@ import sys
 import yaml
 import plac
 from yte.context import Context
-from yte.exceptions import YteError
 from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
 
@@ -21,7 +20,8 @@ def process_yaml(
     * file_or_str - file object or string to render
     * outfile - output file to write to, if None output is returned as string
     * variables - variables to be available in the template
-    * require_use_yte - skip templating if there is no `__use_yte__ = True` statement in the top level of the document
+    * require_use_yte - skip templating if there is no `__use_yte__ = True`
+      statement in the top level of the document
     * disable_features - list of features that should be disabled during rendering.
       Possible values to choose from are ["definitions", "variables"]
     """
