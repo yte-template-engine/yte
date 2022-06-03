@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/yte-template-engine/yte/compare/v1.5.0...v1.5.1) (2022-06-03)
+
+
+### Bug Fixes
+
+* revert to Python 3.9 for release uploading ([a35a10c](https://github.com/yte-template-engine/yte/commit/a35a10c77cae661d9696e672e382cd8c1b20bc31))
+
 ## [1.5.0](https://github.com/yte-template-engine/yte/compare/v1.4.0...v1.5.0) (2022-06-03)
 
 
