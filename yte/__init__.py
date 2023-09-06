@@ -2,7 +2,7 @@ import sys
 import yaml
 import plac
 from yte.context import Context
-from yte.process import FEATURES, _process_yaml_value
+from yte.process import FEATURES, _process_yaml_value, _process_tags, Format
 from yte.document import Document
 
 
@@ -32,8 +32,12 @@ def process_yaml(
     variables["doc"] = doc
     variables["this"] = doc
 
+    loader = yaml.FullLoader
+    loader.add_constructor("!format", lambda loader, node: Format(loader, node))
+    loader.add_constructor("!f", lambda loader, node: Format(loader, node))
+
     try:
-        yaml_doc = yaml.load(file_or_str, Loader=yaml.FullLoader)
+        yaml_doc = yaml.load(file_or_str, Loader=loader)
     except yaml.scanner.ScannerError as e:
         raise yaml.scanner.ScannerError(
             f"{e}\nNote that certain characters like colons have a special "
@@ -48,7 +52,6 @@ def process_yaml(
 
     if not require_use_yte or is_use_yte:
         if disable_features is not None:
-
             disable_features = frozenset(disable_features)
             if not FEATURES.issuperset(disable_features):
                 raise ValueError("Invalid features given to `disable_features`.")
@@ -57,6 +60,12 @@ def process_yaml(
 
         result = _process_yaml_value(
             yaml_doc,
+            variables,
+            context=Context(),
+            disable_features=disable_features,
+        )
+        result = _process_tags(
+            result,
             variables,
             context=Context(),
             disable_features=disable_features,

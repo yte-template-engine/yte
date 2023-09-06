@@ -446,3 +446,23 @@ def test_require_use_yte_false():
         require_use_yte=True,
     )
     assert result == {"?if True": {"foo": 1}}
+
+def test_format():
+    result = _process("""
+__definitions__:
+    - test = "foo"
+test: !format |-
+    {test} {test}{test}""",
+        require_use_yte=True
+    )
+    assert result == {"test": "foo foofoo"}
+
+def test_disable_format():
+    with pytest.raises(YteError):
+        _process("""
+__definitions__:
+    - test = "foo"
+test: !format |-
+    {test} {test}{test}""",
+        require_use_yte=True,
+        disable_features=["format"])

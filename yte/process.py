@@ -1,6 +1,8 @@
 import re
-from yte.context import Context
+import yaml
 
+from abc import ABC, abstractmethod
+from yte.context import Context
 from yte.exceptions import YteError
 
 re_for_loop = re.compile(r"^\?for .+ in .+$")
@@ -8,7 +10,7 @@ re_if = re.compile(r"^\?if (?P<expr>.+)$")
 re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
-FEATURES = frozenset(["variables", "definitions"])
+FEATURES = frozenset(["variables", "definitions", "format"])
 
 
 def _process_yaml_value(
@@ -25,6 +27,29 @@ def _process_yaml_value(
         return result
     elif _is_expr(yaml_value):
         return _process_expr(yaml_value, variables, context)
+    else:
+        return yaml_value
+
+
+def _process_tags(
+    yaml_value,
+    variables: dict,
+    context: Context,
+    disable_features: frozenset,
+):
+    if isinstance(yaml_value, Tag):
+        return yaml_value.process(variables, context, disable_features)
+    if isinstance(yaml_value, dict):
+        res = {}
+        context.template.append("")
+        for k in yaml_value:
+            context.template[-1] = k
+            res[k] = _process_tags(yaml_value[k], variables, context, disable_features)
+        return res
+    elif isinstance(yaml_value, list):
+        return [
+            _process_tags(v, variables, context, disable_features) for v in yaml_value
+        ]
     else:
         return yaml_value
 
@@ -248,3 +273,28 @@ class Conditional:
 
     def value_name(self, index):
         return f"_yte_value_{index}"
+
+
+class Tag(ABC):
+    @abstractmethod
+    def process(self, variables, context: Context, disable_features: frozenset):
+        pass
+
+
+class Format(Tag):
+    def __init__(self, loader: yaml.SafeLoader, node: yaml.nodes.ScalarNode):
+        self.loader = loader
+        self.node = node
+
+    def process(self, variables, context: Context, disable_features: frozenset):
+        if "format" in disable_features:
+            raise YteError("!format have been disabled", context)
+        if isinstance(self.node, yaml.nodes.ScalarNode):
+            value = self.loader.construct_scalar(self.node)
+        else:
+            raise YteError(f"Unexpected !format: must be before ScalarNode, got {type(self.node)}", context)
+        if not isinstance(value, str):
+            return value
+        else:
+            variables = dict(variables)
+            return value.format(**variables)
