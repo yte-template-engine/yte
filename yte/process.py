@@ -1,6 +1,9 @@
 import re
+import textwrap
+import yaml
+from yte.document import Document
+from abc import ABC, abstractmethod
 from yte.context import Context
-
 from yte.exceptions import YteError
 
 re_for_loop = re.compile(r"^\?for .+ in .+$")
@@ -8,7 +11,9 @@ re_if = re.compile(r"^\?if (?P<expr>.+)$")
 re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
-FEATURES = frozenset(["variables", "definitions"])
+FEATURES = frozenset(
+    ["variables", "definitions", "templates", "format", "include", "inherit"]
+)
 
 
 def _process_yaml_value(
@@ -24,18 +29,25 @@ def _process_yaml_value(
         variables["doc"]._insert(context, result)
         return result
     elif _is_expr(yaml_value):
-        return _process_expr(yaml_value, variables, context)
+        return _process_expr(yaml_value, variables, context, disable_features)
     else:
         return yaml_value
 
 
 def _is_expr(yaml_value):
-    return isinstance(yaml_value, str) and yaml_value.startswith("?")
+    return (
+        isinstance(yaml_value, str)
+        and yaml_value.startswith("?")
+        or isinstance(yaml_value, Tag)
+    )
 
 
-def _process_expr(yaml_value, variables, context: Context):
+def _process_expr(yaml_value, variables, context: Context, disable_features: frozenset):
     try:
-        return eval(yaml_value[1:], variables)
+        if isinstance(yaml_value, str):
+            return eval(yaml_value[1:], variables)
+        elif isinstance(yaml_value, Tag):
+            return yaml_value.process(variables, context, disable_features)
     except Exception as e:
         raise YteError(e, context)
 
@@ -94,7 +106,11 @@ def _process_dict_items(
         elif key == "__variables__":
             if "variables" in disable_features:
                 raise YteError("__variables__ have been disabled", key_context)
-            _process_variables(value, variables, key_context)
+            _process_variables(value, variables, key_context, disable_features)
+        elif key == "__templates__":
+            if "templates" in disable_features:
+                raise YteError("__templates__ have been disabled", key_context)
+            _process_templates(value, variables, key_context, disable_features)
         elif re_for_loop.match(key):
             yield from _process_for_loop(
                 key, value, variables, conditional, key_context, disable_features
@@ -141,15 +157,56 @@ def _process_definitions(value, variables, context: Context):
         )
 
 
-def _process_variables(value, variables, context: Context):
+def _process_variables(value, variables, context: Context, disable_features: frozenset):
     if isinstance(value, dict):
         for name, val in value.items():
             if _is_expr(val):
-                val = _process_expr(val, variables, context)
+                val = _process_expr(val, variables, context, disable_features)
             variables[name] = val
     else:
         raise YteError(
             "__variables__ keyword expects a map of variable names and values", context
+        )
+
+
+def _process_templates(
+    value,
+    variables,
+    context: Context,
+    disable_features: frozenset,
+    signature_re=re.compile("^(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)\(.*\)$"),
+):
+    if isinstance(value, dict):
+        for signature, template in value.items():
+            m = signature_re.match(signature)
+            if m is None:
+                raise YteError(f"Invalid template signature: {signature}", context)
+            name = m.group("name")
+
+            def inner(variables):
+                return _process_yaml_value(
+                    template, variables, Context(), disable_features=disable_features
+                )
+
+            code = textwrap.dedent(
+                f"""
+                def {signature}:
+                    variables = locals()
+                    variables["doc"] = Document()
+                    variables["this"] = Document()
+                    return inner(variables)
+                """
+            )
+            _variables = {"inner": inner, "Document": Document}
+
+            exec(code, _variables)
+
+            variables[name] = _variables[name]
+    else:
+        raise YteError(
+            "__templates__ keyword expects a map of template signatures "
+            "(i.e. Python function signatures) and returned valid YTE subdocuments",
+            context,
         )
 
 
@@ -248,3 +305,88 @@ class Conditional:
 
     def value_name(self, index):
         return f"_yte_value_{index}"
+
+
+def _process_inherit(
+    yaml_doc, variables, context: Context, disable_features: frozenset
+):
+    inherit = yaml_doc.get("__inherit__") if isinstance(yaml_doc, dict) else None
+    if inherit is None:
+        return yaml_doc, variables
+    if "inherit" in disable_features:
+        raise YteError("__inherit__ have been disabled", context)
+    yaml_doc.pop("__inherit__")
+    context.template.append("__inherit__")
+    if _is_expr(inherit):
+        inherit = _process_expr(inherit, variables, context, disable_features)
+    if not isinstance(inherit, str):
+        raise YteError(
+            f"You can only __inherit__ to str of path, got {type(inherit)}", context
+        )
+
+    load_func = variables["_load_file"]
+    inherit_yaml_value, inherit_variables = load_func(inherit, variables, context)
+    new_yaml_doc = dict()
+    new_yaml_doc.update(inherit_yaml_value)
+    new_yaml_doc.update(yaml_doc)
+    new_variables = dict()
+    for key in inherit_variables:
+        if key.startswith("_"):
+            continue
+        new_variables[key] = inherit_variables[key]
+    new_variables.update(variables)
+    return new_yaml_doc, new_variables
+
+
+class Tag(ABC):
+    @abstractmethod
+    def process(self, variables, context: Context, disable_features: frozenset):
+        pass
+
+
+class Include(Tag):
+    def __init__(self, loader: yaml.SafeLoader, node: yaml.nodes.ScalarNode):
+        self.loader = loader
+        self.node = node
+
+    def process(self, variables, context: Context, disable_features: frozenset):
+        if "include" in disable_features:
+            raise YteError("!include have been disabled", context)
+        if isinstance(self.node, yaml.nodes.ScalarNode):
+            value = self.loader.construct_scalar(self.node)
+        else:
+            raise YteError(
+                f"Unexpected !include: must be before ScalarNode, got {type(self.node)}",
+                context,
+            )
+        if _is_expr(value):
+            value = _process_expr(value, variables, context, disable_features)
+        if not isinstance(value, str):
+            raise YteError(
+                f"You can only !include str of path, got {type(value)}", context
+            )
+        load_func = variables["_load_file"]
+        yaml_value, _ = load_func(value, variables, context)
+        return yaml_value
+
+
+class Format(Tag):
+    def __init__(self, loader: yaml.SafeLoader, node: yaml.nodes.ScalarNode):
+        self.loader = loader
+        self.node = node
+
+    def process(self, variables, context: Context, disable_features: frozenset):
+        if "format" in disable_features:
+            raise YteError("!format have been disabled", context)
+        if isinstance(self.node, yaml.nodes.ScalarNode):
+            value = self.loader.construct_scalar(self.node)
+        else:
+            raise YteError(
+                f"Unexpected !format: must be before ScalarNode, got {type(self.node)}",
+                context,
+            )
+        if not isinstance(value, str):
+            return value
+        else:
+            variables = dict(variables)
+            return value.format(**variables)

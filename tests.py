@@ -3,6 +3,9 @@ import yte
 import textwrap
 import pytest
 import yaml
+import os.path
+import uuid
+import shutil
 import subprocess as sp
 from yte.context import Context
 from yte.document import Document, Subdocument
@@ -10,13 +13,40 @@ from yte.document import Document, Subdocument
 from yte.exceptions import YteError
 
 
-def _process(yaml_str, outfile=None, disable_features=None, require_use_yte=False):
+def _process(
+    yaml_str,
+    outfile=None,
+    disable_features=None,
+    require_use_yte=False,
+    base_folder=None,
+):
     return yte.process_yaml(
         textwrap.dedent(yaml_str),
         outfile=outfile,
         require_use_yte=require_use_yte,
         disable_features=disable_features,
+        base_folder=base_folder,
     )
+
+
+def _setup_temp_folder(file_contents: dict):
+    folder_path = ""
+    while True:
+        folder_name = f"yte_test_{uuid.uuid4().hex}"
+        folder_path = os.path.join(tempfile.gettempdir(), folder_name)
+        if os.path.isdir(folder_path):
+            continue
+        os.mkdir(folder_path)
+        break
+    for key in file_contents:
+        file_path = os.path.join(folder_path, key.replace("/", os.path.sep))
+        file_folder = os.path.dirname(file_path)
+        if not os.path.isdir(file_folder):
+            os.mkdir(file_folder)
+        f = open(file_path, "w")
+        f.write(file_contents[key])
+        f.close()
+    return folder_path
 
 
 def test_ifelse():
@@ -262,6 +292,21 @@ def test_conditional_error():
         )
 
 
+def test_templates():
+    result = _process(
+        """
+        __templates__:
+          "foo(a, b, c=1)":
+            ?a:
+              - ?b
+              - ?c
+        bar:
+            ?foo("x", "y", c=2)
+        """
+    )
+    assert result == {"bar": {"x": ["y", 2]}}
+
+
 def test_variables():
     result = _process(
         """
@@ -446,3 +491,123 @@ def test_require_use_yte_false():
         require_use_yte=True,
     )
     assert result == {"?if True": {"foo": 1}}
+
+
+def test_format():
+    result = _process(
+        """
+__definitions__:
+    - test = "foo"
+test: !format |-
+    {test} {test}{test}"""
+    )
+    assert result == {"test": "foo foofoo"}
+
+
+def test_disable_format():
+    with pytest.raises(YteError):
+        _process(
+            """
+__definitions__:
+    - test = "foo"
+test: !format |-
+    {test} {test}{test}""",
+            disable_features=["format"],
+        )
+
+
+def test_inherit():
+    test_folder = _setup_temp_folder(
+        {
+            "a.yaml": """
+__variables__:
+    foo: world
+    bar: hello
+
+greet: ?bar + " " + bar + " " + foo
+""",
+            "b.yaml": """
+__inherit__: a.yaml
+
+greet: ?bar + " " + foo
+greet2: ?"hi " + foo
+""",
+        }
+    )
+    try:
+        result = _process(
+            """
+__inherit__: b.yaml
+""",
+            base_folder=test_folder,
+        )
+        assert result == {"greet": "hello world", "greet2": "hi world"}
+    finally:
+        shutil.rmtree(test_folder)
+
+
+def test_disable_inherit():
+    with pytest.raises(YteError):
+        _process(
+            """
+__inherit__: "a.yaml"
+        """,
+            disable_features=["inherit"],
+        )
+
+
+def test_include():
+    test_folder = _setup_temp_folder(
+        {
+            "a.yaml": """
+__variables__:
+    foo: world
+    bar: hello
+
+greet: ?bar + " " + bar + " " + foo
+""",
+            "b.yaml": """
+__inherit__: a.yaml
+
+greet: ?bar + " " + foo
+greet2: ?"hi " + foo
+""",
+            "folder1/c.yaml": """
+__inherit__: !f ../{who_should_c_inherit}.yaml
+greet3: ?this["greet2"] + ", nice 2 see u"
+""",
+        }
+    )
+    try:
+        result = _process(
+            """
+__variables__:
+    who_should_c_inherit: b
+a: !include a.yaml
+b:
+    - !include ./b.yaml
+c: !include folder1/c.yaml
+""",
+            base_folder=test_folder,
+        )
+        assert result == {
+            "a": {"greet": "hello hello world"},
+            "b": [{"greet": "hello world", "greet2": "hi world"}],
+            "c": {
+                "greet": "hello world",
+                "greet2": "hi world",
+                "greet3": "hi world, nice 2 see u",
+            },
+        }
+    finally:
+        shutil.rmtree(test_folder)
+
+
+def test_disable_include():
+    with pytest.raises(YteError):
+        _process(
+            """
+test: !include "a.yaml"
+        """,
+            disable_features=["include"],
+        )
