@@ -11,6 +11,8 @@ re_if = re.compile(r"^\?if (?P<expr>.+)$")
 re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
+DELETE_FLAGS = ["?del", "?delete"]
+
 FEATURES = frozenset(
     ["variables", "definitions", "templates", "format", "include", "inherit"]
 )
@@ -37,7 +39,7 @@ def _process_yaml_value(
 def _is_expr(yaml_value):
     return (
         isinstance(yaml_value, str)
-        and yaml_value.startswith("?")
+        and (yaml_value.startswith("?") or yaml_value in DELETE_FLAGS)
         or isinstance(yaml_value, Tag)
     )
 
@@ -45,6 +47,8 @@ def _is_expr(yaml_value):
 def _process_expr(yaml_value, variables, context: Context, disable_features: frozenset):
     try:
         if isinstance(yaml_value, str):
+            if yaml_value in DELETE_FLAGS:
+                return yaml_value
             return eval(yaml_value[1:], variables)
         elif isinstance(yaml_value, Tag):
             return yaml_value.process(variables, context, disable_features)
@@ -59,8 +63,12 @@ def _process_list(
     disable_features: frozenset,
 ):
     return [
-        _process_yaml_value(item, variables, context, disable_features)
-        for item in yaml_value
+        v
+        for v in [
+            _process_yaml_value(item, variables, context, disable_features)
+            for item in yaml_value
+        ]
+        if v not in DELETE_FLAGS
     ]
 
 
@@ -96,6 +104,7 @@ def _process_dict_items(
 ):
     conditional = Conditional()
 
+    key_context = None
     for key, value in yaml_value.items():
         key_context = Context(context)
         key_context.template.append(key)
@@ -140,8 +149,14 @@ def _process_dict_items(
             )
             variables["doc"]._insert(key_context, value_result)
 
-            yield {key_result: value_result}
-    yield from conditional.process_conditional(variables, key_context, disable_features)
+            if value_result in DELETE_FLAGS:
+                yield {}
+            else:
+                yield {key_result: value_result}
+    if key_context is not None:
+        yield from conditional.process_conditional(
+            variables, key_context, disable_features
+        )
 
 
 def _process_definitions(value, variables, context: Context):
@@ -307,6 +322,17 @@ class Conditional:
         return f"_yte_value_{index}"
 
 
+def _dict_deep_merge(d1: dict, d2: dict):
+    res = dict()
+    res.update(d1)
+    for key, value in d2.items():
+        if key in res and isinstance(value, dict) and isinstance(res[key], dict):
+            res[key] = _dict_deep_merge(res[key], value)
+        else:
+            res[key] = value
+    return res
+
+
 def _process_inherit(
     yaml_doc, variables, context: Context, disable_features: frozenset
 ):
@@ -326,9 +352,7 @@ def _process_inherit(
 
     load_func = variables["_load_file"]
     inherit_yaml_value, inherit_variables = load_func(inherit, variables, context)
-    new_yaml_doc = dict()
-    new_yaml_doc.update(inherit_yaml_value)
-    new_yaml_doc.update(yaml_doc)
+    new_yaml_doc = _dict_deep_merge(inherit_yaml_value, yaml_doc)
     new_variables = dict()
     for key in inherit_variables:
         if key.startswith("_"):
