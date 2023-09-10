@@ -524,12 +524,29 @@ __variables__:
     foo: world
     bar: hello
 
-greet: ?bar + " " + bar + " " + foo
+greet:
+    message1: ?bar + " " + bar + " " + foo
+    number1: 1024
+    message2: !f "{bar} {foo}"
+    nested:
+        not_useful_to_children: 256
+    nested2:
+        k: 94
+        not_useful_to_children: 512
+    nested_arr:
+        - 1
+        - 2
+        - ?delete
 """,
             "b.yaml": """
 __inherit__: a.yaml
 
-greet: ?bar + " " + foo
+greet:
+    message1: ?bar + " " + foo
+    nested2:
+        not_useful_to_children: ?delete
+    nested:
+        not_useful_to_children: ?delete
 greet2: ?"hi " + foo
 """,
         }
@@ -541,7 +558,17 @@ __inherit__: b.yaml
 """,
             base_folder=test_folder,
         )
-        assert result == {"greet": "hello world", "greet2": "hi world"}
+        assert result == {
+            "greet": {
+                "message1": "hello world",
+                "number1": 1024,
+                "message2": "hello world",
+                "nested": {},
+                "nested2": {"k": 94},
+                "nested_arr": [1, 2],
+            },
+            "greet2": "hi world",
+        }
     finally:
         shutil.rmtree(test_folder)
 
