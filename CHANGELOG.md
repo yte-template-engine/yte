@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/yte-template-engine/yte/compare/v1.5.2...v1.5.3) (2023-12-11)
+
+
+### Miscellaneous Chores
+
+* release 1.5.3 ([d3d9e56](https://github.com/yte-template-engine/yte/commit/d3d9e56cf40a53999b0e46a67c766e6a1d229b8e))
+
 ## [1.5.2](https://github.com/yte-template-engine/yte/compare/v1.5.1...v1.5.2) (2023-12-11)
 
 
