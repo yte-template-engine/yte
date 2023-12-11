@@ -2,7 +2,7 @@
 
 [![Docs](https://img.shields.io/badge/user-documentation-green)](https://yte-template-engine.github.io)
 [![test coverage: 100%](https://img.shields.io/badge/test%20coverage-100%25-green)](https://github.com/yte-template-engine/yte/blob/main/pyproject.toml#L30)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/yte-template-engine/yte/CI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/yte-template-engine/yte/testing.yml?branch=main)
 ![PyPI](https://img.shields.io/pypi/v/yte)
 [![Conda Recipe](https://img.shields.io/badge/recipe-yte-green.svg)](https://anaconda.org/conda-forge/yte)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/yte.svg)](https://anaconda.org/conda-forge/yte)
