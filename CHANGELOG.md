@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/yte-template-engine/yte/compare/v1.5.1...v1.5.2) (2023-12-11)
+
+
+### Bug Fixes
+
+* fix errors occuring in document context building when having dicts as list items ([#37](https://github.com/yte-template-engine/yte/issues/37)) ([f347d32](https://github.com/yte-template-engine/yte/commit/f347d32845f4e0bd109adf3fde9e5e25d956c852))
+
 ## [1.5.1](https://github.com/yte-template-engine/yte/compare/v1.5.0...v1.5.1) (2022-06-03)
 
 
