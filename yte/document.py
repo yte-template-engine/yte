@@ -1,6 +1,6 @@
 from yte.context import Context
-from dpath.util import get as dpath_get
-from dpath.util import search as dpath_search
+from dpath import get as dpath_get
+from dpath import search as dpath_search
 
 
 class Subdocument:
@@ -60,10 +60,21 @@ class Document(Subdocument):
             # yaml documents, for which the doc object cannot be used
             # and will remain empty.
             return
+
         inner = self.inner
         for key in context.rendered[:-1]:
-            if key not in inner:
-                inner[key] = Subdocument()
+            if isinstance(inner, list):
+                assert key <= len(inner), "bug: cannot insert at index > len(list)"
+                if key == len(inner):
+                    inner.append(Subdocument())
+            else:
+                if key not in inner:
+                    inner[key] = Subdocument()
             inner = inner[key]
 
-        inner[context.rendered[-1]] = value
+        if isinstance(inner, list):
+            i = context.rendered[-1]
+            assert isinstance(i, int) and i == len(inner)
+            inner.append(value)
+        else:
+            inner[context.rendered[-1]] = value

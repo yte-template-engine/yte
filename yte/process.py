@@ -21,10 +21,10 @@ def _process_yaml_value(
         return _process_dict(yaml_value, variables, Context(context), disable_features)
     elif isinstance(yaml_value, list):
         result = _process_list(yaml_value, variables, context, disable_features)
-        variables["doc"]._insert(context, result)
         return result
     elif _is_expr(yaml_value):
-        return _process_expr(yaml_value, variables, context)
+        result = _process_expr(yaml_value, variables, context)
+        return result
     else:
         return yaml_value
 
@@ -46,10 +46,18 @@ def _process_list(
     context: Context,
     disable_features: frozenset,
 ):
-    return [
-        _process_yaml_value(item, variables, context, disable_features)
-        for item in yaml_value
-    ]
+    variables["doc"]._insert(context, [])
+
+    def _process():
+        for i, item in enumerate(yaml_value):
+            _context = Context(context)
+            _context.rendered.append(i)
+            value = _process_yaml_value(item, variables, _context, disable_features)
+            if not isinstance(item, (dict, list)):
+                variables["doc"]._insert(_context, value)
+            yield value
+
+    return list(_process())
 
 
 def _process_dict(
