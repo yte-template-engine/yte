@@ -446,3 +446,35 @@ def test_require_use_yte_false():
         require_use_yte=True,
     )
     assert result == {"?if True": {"foo": 1}}
+
+
+def test_complex_1():
+    _process(
+        """
+    __use_yte__: true
+    html:
+        head:
+            title: Test landing page
+        body:
+            div:
+                class: foo
+                content:
+                    - p: Hello, this is some text. How do we get a tag into it? We could avoid tags and just render this as markdown.
+                    - p:
+                        class: bar
+                        content:
+                            - This is untagged text
+                            - span:
+                                content: This is a span
+                                class: bold
+                            - This is more untagged text
+                    - ?if True:
+                        markdown: |
+                            # This is a markdown heading
+                            This is some markdown text
+                      ?else:
+                        markdown: |
+                            # This is a different markdown heading
+                            This is some different markdown text
+    """  # noqa: B950
+    )
