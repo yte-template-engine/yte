@@ -1,4 +1,5 @@
 import sys
+import asyncio
 import yaml
 import plac
 from yte.context import Context
@@ -6,7 +7,7 @@ from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
 
 
-def process_yaml(
+async def process_yaml(
     file_or_str,
     outfile=None,
     variables=None,
@@ -55,7 +56,7 @@ def process_yaml(
         else:
             disable_features = frozenset([])
 
-        result = _process_yaml_value(
+        result = await _process_yaml_value(
             yaml_doc,
             variables,
             context=Context(),
@@ -86,7 +87,7 @@ def cli(
     Note: if nothing is provided at STDIN,
     this will wait forever.
     """
-    process_yaml(sys.stdin, outfile=sys.stdout)
+    asyncio.run(process_yaml(sys.stdin, outfile=sys.stdout))
 
 
 def main():
