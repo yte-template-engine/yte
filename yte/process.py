@@ -12,6 +12,7 @@ re_else = re.compile(r"^\?else$")
 
 FEATURES = frozenset(["variables", "definitions"])
 
+
 async def _process_yaml_value(
     yaml_value,
     variables: dict,
@@ -19,7 +20,9 @@ async def _process_yaml_value(
     disable_features: frozenset,
 ):
     if isinstance(yaml_value, dict):
-        return await _process_dict(yaml_value, variables, Context(context), disable_features)
+        return await _process_dict(
+            yaml_value, variables, Context(context), disable_features
+        )
     elif isinstance(yaml_value, list):
         result = await _process_list(yaml_value, variables, context, disable_features)
         return result
@@ -63,7 +66,9 @@ async def _process_list(
         for i, item in enumerate(yaml_value):
             _context = Context(context)
             _context.rendered.append(i)
-            value = await _process_yaml_value(item, variables, _context, disable_features)
+            value = await _process_yaml_value(
+                item, variables, _context, disable_features
+            )
             if not isinstance(item, (dict, list)):
                 variables["doc"]._insert(_context, value)
             yield value
@@ -77,7 +82,12 @@ async def _process_dict(
     context: Context,
     disable_features: frozenset,
 ):
-    items = [item async for item in _process_dict_items(yaml_value, variables, context, disable_features)]
+    items = [
+        item
+        async for item in _process_dict_items(
+            yaml_value, variables, context, disable_features
+        )
+    ]
     if all(isinstance(item, dict) for item in items):
         result = dict()
         for item in items:
@@ -148,7 +158,9 @@ async def _process_dict_items(
             variables["doc"]._insert(key_context, value_result)
 
             yield {key_result: value_result}
-    async for cnd in conditional.process_conditional(variables, key_context, disable_features):
+    async for cnd in conditional.process_conditional(
+        variables, key_context, disable_features
+    ):
         yield cnd
 
 
@@ -176,10 +188,13 @@ async def _process_variables(value, variables, context: Context):
             "__variables__ keyword expects a map of variable names and values", context
         )
 
+
 async def _process_for_loop(
     key, value, variables, conditional, context: Context, disable_features: frozenset
 ):
-    async for cnd in conditional.process_conditional(variables, context, disable_features):
+    async for cnd in conditional.process_conditional(
+        variables, context, disable_features
+    ):
         yield cnd
     _variables = dict(variables)
     _variables["_yte_value"] = value
@@ -198,7 +213,9 @@ async def _process_for_loop(
 async def _process_if(
     key, value, variables, conditional, context: Context, disable_features: frozenset
 ):
-    async for cnd in conditional.process_conditional(variables, context, disable_features):
+    async for cnd in conditional.process_conditional(
+        variables, context, disable_features
+    ):
         yield cnd
     expr = re_if.match(key).group("expr")
     conditional.register_if(expr, value)
@@ -217,7 +234,9 @@ async def _process_else(
     if conditional.is_empty():
         raise YteError("Unexpected else: no if or elif before", context)
     conditional.register_else(value)
-    async for result in conditional.process_conditional(variables, context, disable_features):
+    async for result in conditional.process_conditional(
+        variables, context, disable_features
+    ):
         yield result
 
 

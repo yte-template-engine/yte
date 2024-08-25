@@ -31,7 +31,11 @@ def _process(yaml_str, **kwargs):
         outfile=outfile,
         require_use_yte=require_use_yte,
         disable_features=disable_features,
-        variables={"async_function": adouble, "async_condition": acond, "arange": arange},
+        variables={
+            "async_function": adouble,
+            "async_condition": acond,
+            "arange": arange,
+        },
         **kwargs,
     ))
 
@@ -496,15 +500,19 @@ def test_complex_1():
     """  # noqa: B950
     )
 
-async def adouble(num:int):
+
+async def adouble(num: int):
     return num * 2
 
-async def acond(cond:bool):
+
+async def acond(cond: bool):
     return cond
+
 
 async def arange(*args, **kwargs):
     for i in range(*args, **kwargs):
         yield i
+
 
 def test_simple_async_expression():
     result = _process(
@@ -513,6 +521,7 @@ def test_simple_async_expression():
         """,
     )
     assert result == {"value": 4}
+
 
 def test_async_expression_in_list():
     result = _process(
@@ -525,6 +534,7 @@ def test_async_expression_in_list():
     )
     assert result == {"values": [2, 4, 6]}
 
+
 def test_async_for_loop():
     result = _process(
         """
@@ -533,6 +543,7 @@ def test_async_for_loop():
         """,
     )
     assert result == [0, 2, 4]
+
 
 def test_async_if_condition_true():
     result = _process(
@@ -545,6 +556,7 @@ def test_async_if_condition_true():
     )
     assert result == {"result": "Condition was true"}
 
+
 def test_async_if_condition_false():
     result = _process(
         """
@@ -556,6 +568,7 @@ def test_async_if_condition_false():
     )
     assert result == {"result": "Condition was false"}
 
+
 def test_nested_async_expressions():
     result = _process(
         """
@@ -566,6 +579,7 @@ def test_nested_async_expressions():
     )
     assert result == {"nested": {"level1": {"level2": 10}}}
 
+
 def test_async_expression_with_variables():
     result = _process(
         """
@@ -575,6 +589,7 @@ def test_async_expression_with_variables():
         """,
     )
     assert result == {"result": 10}
+
 
 def test_async_expression_exception():
     with pytest.raises(Exception):

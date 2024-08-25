@@ -1,6 +1,7 @@
 import asyncio
 import aioconsole
 
+
 async def aeval(input_string: str, local_namespace: dict[str, object]):
     """
     Asynchronously evaluate a Python expression or statement within a given local namespace.
@@ -13,22 +14,22 @@ async def aeval(input_string: str, local_namespace: dict[str, object]):
     input_string : str
         The Python code to be executed, provided as a string. This can be an expression, a statement, or a series of statements.
     local_namespace : dict
-        A dictionary of key-value pairs representing the local namespace where the code will be executed. 
+        A dictionary of key-value pairs representing the local namespace where the code will be executed.
         The provided namespace is used to store and retrieve variables and results from the executed code.
 
     Returns:
     --------
     Any
-        The result of the evaluated expression or statement. If the input was an asynchronous function, it will be awaited, 
-        and the result of that function will be returned. If the input was a statement without a return value, 
+        The result of the evaluated expression or statement. If the input was an asynchronous function, it will be awaited,
+        and the result of that function will be returned. If the input was a statement without a return value,
         the function returns None.
 
     Raises:
     -------
     SyntaxError
-        If the provided code string contains a syntax error. The original input will be executed if the modified input 
+        If the provided code string contains a syntax error. The original input will be executed if the modified input
         for capturing the result fails due to syntax error.
-    
+
     Example Usage:
     --------------
     result = await aeval("x + y", x=2, y=3)
@@ -41,13 +42,13 @@ async def aeval(input_string: str, local_namespace: dict[str, object]):
       is executed without modification.
     - The function handles asynchronous functions by awaiting them if they are not assigned to a variable.
     """
-    
+
     # Initialize the local namespace with the provided keyword arguments
     local_namespace["asyncio"] = asyncio
-    
+
     # Save the state of the local namespace before executing the code
     previous = {k: v for k, v in local_namespace.items()}
-    
+
     # Modify the user input to capture the result of the expression in a special variable '__result__'
     modified_input = f"__result__ = {input_string}"
 
@@ -61,7 +62,7 @@ async def aeval(input_string: str, local_namespace: dict[str, object]):
 
     # Attempt to retrieve the result of the expression from the local namespace
     result = local_namespace.pop("__result__", None)
-    
+
     # Capture the state of the local namespace after execution
     post = {k: v for k, v in local_namespace.items()}
 

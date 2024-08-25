@@ -71,11 +71,13 @@ async def aprocess_yaml(
     else:
         return result
 
+
 def process_yaml(*args, **kwargs):
     """
     Synchronous entrypoint for backwards compatibility
     """
     return asyncio.run(aprocess_yaml(*args, **kwargs))
+
 
 @plac.flg(
     "require_use_yte",
@@ -90,7 +92,7 @@ def cli(
     and print the result to STDOUT.
 
     Note: if nothing is provided at STDIN,
-    th*is will wait forever.
+    this will wait forever.
     """
     process_yaml(sys.stdin, outfile=sys.stdout)
 
