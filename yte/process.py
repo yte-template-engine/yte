@@ -120,9 +120,10 @@ async def _process_dict_items(
             ):
                 yield result
         elif re_if.match(key):
-            _process_if(
+            async for cnd in _process_if(
                 key, value, variables, conditional, key_context, disable_features
-            )
+            ):
+                yield cnd
         elif re_elif.match(key):
             _process_elif(key, value, variables, conditional, key_context)
         elif re_else.match(key):
@@ -194,9 +195,11 @@ async def _process_for_loop(
         yield item
 
 
-def _process_if(
+async def _process_if(
     key, value, variables, conditional, context: Context, disable_features: frozenset
 ):
+    async for cnd in conditional.process_conditional(variables, context, disable_features):
+        yield cnd
     expr = re_if.match(key).group("expr")
     conditional.register_if(expr, value)
 

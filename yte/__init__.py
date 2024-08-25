@@ -7,7 +7,7 @@ from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
 
 
-async def process_yaml(
+async def aprocess_yaml(
     file_or_str,
     outfile=None,
     variables=None,
@@ -71,6 +71,11 @@ async def process_yaml(
     else:
         return result
 
+def process_yaml(*args, **kwargs):
+    """
+    Synchronous entrypoint for backwards compatibility
+    """
+    return asyncio.run(aprocess_yaml(*args, **kwargs))
 
 @plac.flg(
     "require_use_yte",
@@ -85,9 +90,9 @@ def cli(
     and print the result to STDOUT.
 
     Note: if nothing is provided at STDIN,
-    this will wait forever.
+    th*is will wait forever.
     """
-    asyncio.run(process_yaml(sys.stdin, outfile=sys.stdout))
+    process_yaml(sys.stdin, outfile=sys.stdout)
 
 
 def main():
