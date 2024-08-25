@@ -2,7 +2,7 @@ import asyncio
 import aioconsole
 
 
-async def aeval(input_string: str, local_namespace: dict[str, object]):
+async def aeval(input_string: str, local_namespace: dict):
     """
     Asynchronously evaluate a Python expression or statement within a given local namespace.
 
@@ -24,12 +24,6 @@ async def aeval(input_string: str, local_namespace: dict[str, object]):
         and the result of that function will be returned. If the input was a statement without a return value,
         the function returns None.
 
-    Raises:
-    -------
-    SyntaxError
-        If the provided code string contains a syntax error. The original input will be executed if the modified input
-        for capturing the result fails due to syntax error.
-
     Example Usage:
     --------------
     result = await aeval("x + y", x=2, y=3)
@@ -43,7 +37,7 @@ async def aeval(input_string: str, local_namespace: dict[str, object]):
     - The function handles asynchronous functions by awaiting them if they are not assigned to a variable.
     """
 
-    # Initialize the local namespace with the provided keyword arguments
+    # Ensure that the 'asyncio' module is available in the local namespace
     local_namespace["asyncio"] = asyncio
 
     # Save the state of the local namespace before executing the code
