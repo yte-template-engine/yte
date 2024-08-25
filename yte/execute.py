@@ -1,5 +1,5 @@
 import asyncio
-import aioconsole
+from aioconsole import aexec
 
 
 async def aeval(input_string: str, local_namespace: dict):
@@ -36,23 +36,30 @@ async def aeval(input_string: str, local_namespace: dict):
       is executed without modification.
     - The function handles asynchronous functions by awaiting them if they are not assigned to a variable.
     """
-
-    # Ensure that the 'asyncio' module is available in the local namespace
+    # Ensure asyncio is always part of the namespace
     local_namespace["asyncio"] = asyncio
 
     # Save the state of the local namespace before executing the code
     previous = {k: v for k, v in local_namespace.items()}
 
-    # Modify the user input to capture the result of the expression in a special variable '__result__'
-    modified_input = f"__result__ = {input_string}"
+    # Split the input string by lines to handle multiline input
+    lines = input_string.splitlines()
 
-    try:
-        # Try to execute the modified input to capture the result in '__result__'
-        await aioconsole.aexec(modified_input, local_namespace)
-    except SyntaxError:
-        # If there's a syntax error, it might be due to the input being a statement rather than an expression.
-        # In this case, execute the original input without modification.
-        await aioconsole.aexec(input_string, local_namespace)
+    for i, line in enumerate(lines):
+        # Capture the result of the expression in a special variable '__result__'
+        if i == len(lines) - 1:
+            # Only modify the last line to capture the final result
+            modified_input = f"__result__ = {line}"
+        else:
+            modified_input = line
+
+        try:
+            # Try to execute the modified input to capture the result in '__result__'
+            await aexec(modified_input, local_namespace)
+        except SyntaxError:
+            # This might be a statement rather than an expression.
+            # In this case, execute the original input without modification.
+            await aexec(line, local_namespace)
 
     # Attempt to retrieve the result of the expression from the local namespace
     result = local_namespace.pop("__result__", None)
@@ -60,9 +67,10 @@ async def aeval(input_string: str, local_namespace: dict):
     # Capture the state of the local namespace after execution
     post = {k: v for k, v in local_namespace.items()}
 
-    # Check if the local namespace has changed; if not, the code might have been a statement rather than an expression
+    # Check if the local namespace has changed.
+    # If not, the code might have been a statement rather than an expression
     if previous == post:
-        # If the result is an asynchronous function (coroutine) and wasn't assigned to a variable, await its result
+        # The result is a coroutine and wasn't assigned to a variable, await its result
         if asyncio.iscoroutine(result) and result not in local_namespace.values():
             result = await result
 
