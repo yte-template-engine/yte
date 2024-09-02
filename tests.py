@@ -1,3 +1,4 @@
+import asyncio
 import tempfile
 import yte
 import textwrap
@@ -16,6 +17,11 @@ def _process(yaml_str, outfile=None, disable_features=None, require_use_yte=Fals
         outfile=outfile,
         require_use_yte=require_use_yte,
         disable_features=disable_features,
+        variables={
+            "async_function": adouble,
+            "async_condition": acond,
+            "arange": arange,
+        },
     )
 
 
@@ -478,3 +484,102 @@ def test_complex_1():
                             This is some different markdown text
     """  # noqa: B950
     )
+
+
+async def adouble(num: int):
+    return num * 2
+
+
+async def acond(cond: bool):
+    return cond
+
+
+async def arange(*args, **kwargs):
+    for i in range(*args, **kwargs):
+        yield i
+
+
+def test_simple_async_expression():
+    result = _process(
+        """
+        value: ?await async_function(2)
+        """,
+    )
+    assert result == {"value": 4}
+
+
+def test_async_expression_in_list():
+    result = _process(
+        """
+        values:
+          - ?await async_function(1)
+          - ?await async_function(2)
+          - ?await async_function(3)
+        """,
+    )
+    assert result == {"values": [2, 4, 6]}
+
+
+def test_async_for_loop():
+    result = _process(
+        """
+        ?async for i in arange(3):
+          - ?await async_function(i)
+        """,
+    )
+    assert result == [0, 2, 4]
+
+
+def test_async_if_condition_true():
+    result = _process(
+        """
+        ?if await async_condition(True):
+          result: "Condition was true"
+        ?else:
+          result: "Condition was false"
+        """,
+    )
+    assert result == {"result": "Condition was true"}
+
+
+def test_async_if_condition_false():
+    result = _process(
+        """
+        ?if await async_condition(False):
+          result: "Condition was true"
+        ?else:
+          result: "Condition was false"
+        """,
+    )
+    assert result == {"result": "Condition was false"}
+
+
+def test_nested_async_expressions():
+    result = _process(
+        """
+        nested:
+          level1:
+            level2: ?await async_function(5)
+        """,
+    )
+    assert result == {"nested": {"level1": {"level2": 10}}}
+
+
+def test_async_expression_with_variables():
+    result = _process(
+        """
+        __variables__:
+          base: 5
+        result: ?await async_function(base)
+        """,
+    )
+    assert result == {"result": 10}
+
+
+def test_async_expression_exception():
+    with pytest.raises(Exception):
+        _process(
+            """
+            result: ?await invalid
+            """,
+        )

@@ -1,4 +1,5 @@
 import sys
+import asyncio
 import yaml
 import plac
 from yte.context import Context
@@ -6,7 +7,7 @@ from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
 
 
-def process_yaml(
+async def aprocess_yaml(
     file_or_str,
     outfile=None,
     variables=None,
@@ -55,7 +56,7 @@ def process_yaml(
         else:
             disable_features = frozenset([])
 
-        result = _process_yaml_value(
+        result = await _process_yaml_value(
             yaml_doc,
             variables,
             context=Context(),
@@ -69,6 +70,13 @@ def process_yaml(
         yaml.dump(result, outfile, sort_keys=False)
     else:
         return result
+
+
+def process_yaml(*args, **kwargs):
+    """
+    Synchronous entrypoint for backwards compatibility
+    """
+    return asyncio.run(aprocess_yaml(*args, **kwargs))
 
 
 @plac.flg(
