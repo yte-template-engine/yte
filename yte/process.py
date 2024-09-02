@@ -1,8 +1,7 @@
 import re
 from yte.context import Context
 from yte.exceptions import YteError
-from yte.execute import aeval
-from aioconsole import aexec
+from aioconsole import aexec, aeval
 
 re_async_for_loop = re.compile(r"^\?async for .+ in .+$")
 re_for_loop = re.compile(r"^\?for .+ in .+$")

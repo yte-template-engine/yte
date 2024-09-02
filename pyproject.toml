@@ -9,7 +9,7 @@ repository = "https://github.com/yte-template-engine/yte"
 version = "2.0.0"
 
 [tool.poetry.dependencies]
-aioconsole = ">=0.6"
+aioconsole = ">=0.8.0"
 dpath = "^2.1"
 plac = "^1.3.4"
 python = ">=3.7"
