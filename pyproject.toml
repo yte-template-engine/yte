@@ -6,7 +6,7 @@ license = "MIT"
 name = "yte"
 readme = "README.md"
 repository = "https://github.com/yte-template-engine/yte"
-version = "1.5.1"
+version = "1.5.5"
 
 [tool.poetry.dependencies]
 dpath = "^2.1"
@@ -20,6 +20,7 @@ coverage = {extras = ["toml"], version = "^6.3.1"}
 flake8 = "^4.0.1"
 flake8-bugbear = "^22.1.11"
 pytest = "^7.0"
+numpy = ">=1.0"
 
 [tool.coverage.run]
 omit = [".*", "*/site-packages/*"]
@@ -31,6 +32,7 @@ exclude_lines = [
   "process_yaml\\(sys.stdin, outfile=sys\\.stdout\\)",
   "plac.call\\(cli\\)",
 ]
+omit = ["tests.py"]
 fail_under = 100
 
 [tool.poetry.scripts]

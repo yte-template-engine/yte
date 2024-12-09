@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.5.5](https://github.com/yte-template-engine/yte/compare/v1.5.4...v1.5.5) (2024-12-09)
+
+
+### Bug Fixes
+
+* increase serialization robustness by explicitly converting numpy strings to python strings ([#47](https://github.com/yte-template-engine/yte/issues/47)) ([2640720](https://github.com/yte-template-engine/yte/commit/2640720a12069d773b3fbff04e0c967b9471a1ab))
+
+## [1.5.4](https://github.com/yte-template-engine/yte/compare/v1.5.3...v1.5.4) (2023-12-11)
+
+
+### Miscellaneous Chores
+
+* fix release process ([7ed63f9](https://github.com/yte-template-engine/yte/commit/7ed63f9fde43899b4b1b746003d66d869a0ed415))
+
+## [1.5.3](https://github.com/yte-template-engine/yte/compare/v1.5.2...v1.5.3) (2023-12-11)
+
+
+### Miscellaneous Chores
+
+* release 1.5.3 ([d3d9e56](https://github.com/yte-template-engine/yte/commit/d3d9e56cf40a53999b0e46a67c766e6a1d229b8e))
+
+## [1.5.2](https://github.com/yte-template-engine/yte/compare/v1.5.1...v1.5.2) (2023-12-11)
+
+
+### Bug Fixes
+
+* fix errors occuring in document context building when having dicts as list items ([#37](https://github.com/yte-template-engine/yte/issues/37)) ([f347d32](https://github.com/yte-template-engine/yte/commit/f347d32845f4e0bd109adf3fde9e5e25d956c852))
+
 ## [1.5.1](https://github.com/yte-template-engine/yte/compare/v1.5.0...v1.5.1) (2022-06-03)
 
 
