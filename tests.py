@@ -1,3 +1,4 @@
+import builtins
 import tempfile
 import yte
 import textwrap
@@ -9,13 +10,24 @@ from yte.document import Document, Subdocument
 
 from yte.exceptions import YteError
 
+import numpy as np
 
-def _process(yaml_str, outfile=None, disable_features=None, require_use_yte=False):
+
+real_import = builtins.__import__
+
+
+def monkey_no_numpy(name, globals=None, locals=None, fromlist=(), level=0):
+    if name == "numpy":
+        raise ModuleNotFoundError("Module numpy not found (mocked).")
+    return real_import(
+        name, globals=globals, locals=locals, fromlist=fromlist, level=level
+    )
+
+
+def _process(yaml_str, **kwargs):
     return yte.process_yaml(
         textwrap.dedent(yaml_str),
-        outfile=outfile,
-        require_use_yte=require_use_yte,
-        disable_features=disable_features,
+        **kwargs,
     )
 
 
@@ -478,3 +490,22 @@ def test_complex_1():
                             This is some different markdown text
     """  # noqa: B950
     )
+
+
+def test_numpy():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?for val in someval:
+                ?val: 1
+    """,
+        variables={"someval": np.array(["a", "b", "c"])},
+    )
+    assert result == {"foo": {"bar": {"a": 1, "b": 1, "c": 1}}}
+
+
+def test_numpy_missing(monkeypatch):
+    monkeypatch.setattr(builtins, "__import__", monkey_no_numpy)
+    test_numpy()

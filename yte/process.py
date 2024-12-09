@@ -24,6 +24,16 @@ def _process_yaml_value(
         return result
     elif _is_expr(yaml_value):
         result = _process_expr(yaml_value, variables, context)
+        try:
+            import numpy as np
+
+            if isinstance(result, np.str_):
+                # Seemingly depending on the numpy version, some np.str_ objects
+                # are not properly serialized by yaml. By this conversion, we
+                # aim to increase the robustness of the serialization.
+                return str(result)
+        except ImportError:
+            pass
         return result
     else:
         return yaml_value
