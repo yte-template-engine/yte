@@ -20,6 +20,7 @@ coverage = {extras = ["toml"], version = "^6.3.1"}
 flake8 = "^4.0.1"
 flake8-bugbear = "^22.1.11"
 pytest = "^7.0"
+numpy = ">=1.0"
 
 [tool.coverage.run]
 omit = [".*", "*/site-packages/*"]
