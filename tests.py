@@ -489,6 +489,6 @@ def test_numpy():
             ?for val in someval:
                 ?val: 1
     """,
-    variables={"someval": np.array(["a", "b", "c"])}
+        variables={"someval": np.array(["a", "b", "c"])},
     )
     assert result == {"foo": {"bar": {"a": 1, "b": 1, "c": 1}}}

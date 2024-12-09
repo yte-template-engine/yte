@@ -26,6 +26,7 @@ def _process_yaml_value(
         result = _process_expr(yaml_value, variables, context)
         try:
             import numpy as np
+
             if isinstance(result, np.str_):
                 # Seemingly depending on the numpy version, some np.str_ objects
                 # are not properly serialized by yaml. By this conversion, we
