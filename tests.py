@@ -19,7 +19,9 @@ real_import = builtins.__import__
 def monkey_no_numpy(name, globals=None, locals=None, fromlist=(), level=0):
     if name == "numpy":
         raise ModuleNotFoundError("Module numpy not found (mocked).")
-    return real_import(name, globals=globals, locals=locals, fromlist=fromlist, level=level)
+    return real_import(
+        name, globals=globals, locals=locals, fromlist=fromlist, level=level
+    )
 
 
 def _process(yaml_str, **kwargs):
