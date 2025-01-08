@@ -1,4 +1,3 @@
-import asyncio
 import builtins
 import tempfile
 import yte
@@ -26,18 +25,10 @@ def monkey_no_numpy(name, globals=None, locals=None, fromlist=(), level=0):
 
 
 def _process(yaml_str, **kwargs):
-    return asyncio.run(yte.process_yaml(
+    return yte.process_yaml(
         textwrap.dedent(yaml_str),
-        outfile=outfile,
-        require_use_yte=require_use_yte,
-        disable_features=disable_features,
-        variables={
-            "async_function": adouble,
-            "async_condition": acond,
-            "arange": arange,
-        },
-        **kwargs,
-    ))
+        **kwargs
+    )
 
 
 def test_ifelse():
@@ -499,8 +490,26 @@ def test_complex_1():
                             This is some different markdown text
     """  # noqa: B950
     )
+    
+    
+def test_numpy():
+    result = _process(
+    """
+    __use_yte__: true
+    foo:
+        bar:
+            ?for val in someval:
+                ?val: 1
+    """,
+        variables={"someval": np.array(["a", "b", "c"])},
+    )
+    assert result == {"foo": {"bar": {"a": 1, "b": 1, "c": 1}}}
 
 
+def test_numpy_missing(monkeypatch):
+    monkeypatch.setattr(builtins, "__import__", monkey_no_numpy)
+    test_numpy()
+    
 async def adouble(num: int):
     return num * 2
 
@@ -519,6 +528,7 @@ def test_simple_async_expression():
         """
         value: ?await async_function(2)
         """,
+        variables = {"async_function": adouble}
     )
     assert result == {"value": 4}
 
@@ -531,6 +541,7 @@ def test_async_expression_in_list():
           - ?await async_function(2)
           - ?await async_function(3)
         """,
+        variables = {"async_function": adouble}
     )
     assert result == {"values": [2, 4, 6]}
 
@@ -541,6 +552,7 @@ def test_async_for_loop():
         ?async for i in arange(3):
           - ?await async_function(i)
         """,
+        variables = {"async_function": adouble, "arange": arange}
     )
     assert result == [0, 2, 4]
 
@@ -553,6 +565,7 @@ def test_async_if_condition_true():
         ?else:
           result: "Condition was false"
         """,
+        variables = {"async_condition": acond}
     )
     assert result == {"result": "Condition was true"}
 
@@ -565,6 +578,7 @@ def test_async_if_condition_false():
         ?else:
           result: "Condition was false"
         """,
+        variables = {"async_condition": acond}
     )
     assert result == {"result": "Condition was false"}
 
@@ -576,6 +590,7 @@ def test_nested_async_expressions():
           level1:
             level2: ?await async_function(5)
         """,
+        variables = {"async_function": adouble}
     )
     assert result == {"nested": {"level1": {"level2": 10}}}
 
@@ -587,6 +602,7 @@ def test_async_expression_with_variables():
           base: 5
         result: ?await async_function(base)
         """,
+        variables = {"async_function": adouble}
     )
     assert result == {"result": 10}
 
