@@ -5,6 +5,7 @@ import plac
 from yte.context import Context
 from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
+from concurrent.futures import ThreadPoolExecutor
 
 
 async def aprocess_yaml(
@@ -76,7 +77,16 @@ def process_yaml(*args, **kwargs):
     """
     Synchronous entrypoint for backwards compatibility
     """
-    return asyncio.run(aprocess_yaml(*args, **kwargs))
+    coroutine = aprocess_yaml(*args, **kwargs)
+    try:
+        asyncio.get_running_loop()
+        # If there is a running loop, then run the coroutine in an executor
+        with ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, coroutine)
+            return future.result()
+    except RuntimeError:
+        # There is no existing loop, create our own
+        return asyncio.run(coroutine)
 
 
 @plac.flg(

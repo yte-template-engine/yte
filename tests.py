@@ -1,3 +1,4 @@
+import asyncio
 import builtins
 import tempfile
 import yte
@@ -614,3 +615,12 @@ def test_async_expression_exception():
             result: ?await invalid
             """,
         )
+
+@pytest.mark.asyncio
+async def test_existing_loop():
+    _process(
+        """
+        value: ?await asyncio.sleep(0)
+        """,
+        variables = {"asyncio": asyncio}
+    )
