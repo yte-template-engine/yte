@@ -19,6 +19,11 @@ try:
             return str(value)
         return value
 
+    def _handle_numpy_array(value):
+        if isinstance(value, np.ndarray):
+            return value.tolist()
+        return value
+
 except ImportError:
 
     def _handle_numpy_str(value):
@@ -38,6 +43,8 @@ def _process_yaml_value(
         return result
     elif _is_expr(yaml_value):
         result = _process_expr(yaml_value, variables, context)
+
+        result = _handle_numpy_array(result)
 
         if isinstance(result, list):
             return list(map(_handle_numpy_str, result))
