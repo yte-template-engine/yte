@@ -1,6 +1,5 @@
 import builtins
 import importlib
-import sys
 import tempfile
 import yte
 import textwrap
