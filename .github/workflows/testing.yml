@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   formatting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
         run: poetry run black --check .
 
   linting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
       matrix:
         python-version: ["3.7", "3.9", "3.10"]
         poetry-version: ["1.1"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
