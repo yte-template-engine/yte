@@ -18,7 +18,9 @@ try:
         if isinstance(value, np.str_):
             return str(value)
         return value
+
 except ImportError:
+
     def _handle_numpy_str(value):
         return value
 
@@ -40,7 +42,10 @@ def _process_yaml_value(
         if isinstance(result, list):
             return list(map(_handle_numpy_str, result))
         elif isinstance(result, dict):
-            return {_handle_numpy_str(key): _handle_numpy_str(value) for key, value in result.items()}
+            return {
+                _handle_numpy_str(key): _handle_numpy_str(value)
+                for key, value in result.items()
+            }
         else:
             return _handle_numpy_str(result)
     else:
