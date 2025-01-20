@@ -62,6 +62,13 @@ jobs:
       - name: Setup poetry
         run: pip install poetry
 
+      # Workaround needed to solve numpy error:
+      # Backend 'setuptools.build_meta:__legacy__' is not available
+      # The error occurs with python 3.12
+      # TODO maybe remove in the future.
+      - name: Setup cython
+        run: pip install cython
+
       - name: Install Dependencies using Poetry
         run: poetry install
 
