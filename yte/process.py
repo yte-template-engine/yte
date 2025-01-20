@@ -29,6 +29,9 @@ except ImportError:
     def _handle_numpy_str(value):
         return value
 
+    def _handle_numpy_array(value):
+        return value
+
 
 def _process_yaml_value(
     yaml_value,

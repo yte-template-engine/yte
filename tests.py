@@ -1,4 +1,6 @@
 import builtins
+import importlib
+import sys
 import tempfile
 import yte
 import textwrap
@@ -544,10 +546,22 @@ def test_numpy_2d_array():
     """,
         variables={"someval": np.array([["a", "b", "c"]])},
     )
-    print(result)
     assert result == {"foo": {"bar": [["a", "b", "c"]]}}
 
 
 def test_numpy_missing(monkeypatch):
-    monkeypatch.setattr(builtins, "__import__", monkey_no_numpy)
-    test_numpy()
+    monkeypatch.setattr("builtins.__import__", monkey_no_numpy)
+    importlib.reload(yte.process)
+
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+        baz:
+            ?5
+    """,
+        variables={"someval": ["a", "b", "c"]},
+    )
+    assert result == {"foo": {"bar": ["a", "b", "c"], "baz": 5}}
