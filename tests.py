@@ -507,6 +507,19 @@ def test_numpy():
     assert result == {"foo": {"bar": {"a": 1, "b": 1, "c": 1}}}
 
 
+def test_expr_dict():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+    """,
+        variables={"someval": {"a": 1, "b": 2}},
+    )
+    assert result == {"foo": {"bar": {"a": 1, "b": 2}}}
+
+
 def test_numpy_list():
     result = _process(
         """
