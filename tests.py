@@ -1,4 +1,5 @@
 import builtins
+import importlib
 import tempfile
 import yte
 import textwrap
@@ -506,6 +507,73 @@ def test_numpy():
     assert result == {"foo": {"bar": {"a": 1, "b": 1, "c": 1}}}
 
 
+def test_expr_dict():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+    """,
+        variables={"someval": {"a": 1, "b": 2}},
+    )
+    assert result == {"foo": {"bar": {"a": 1, "b": 2}}}
+
+
+def test_numpy_list():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?list(someval)
+    """,
+        variables={"someval": np.array(["a", "b", "c"])},
+    )
+    print(result)
+    assert result == {"foo": {"bar": ["a", "b", "c"]}}
+
+
+def test_numpy_array():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+    """,
+        variables={"someval": np.array(["a", "b", "c"])},
+    )
+    print(result)
+    assert result == {"foo": {"bar": ["a", "b", "c"]}}
+
+
+def test_numpy_2d_array():
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+    """,
+        variables={"someval": np.array([["a", "b", "c"]])},
+    )
+    assert result == {"foo": {"bar": [["a", "b", "c"]]}}
+
+
 def test_numpy_missing(monkeypatch):
-    monkeypatch.setattr(builtins, "__import__", monkey_no_numpy)
-    test_numpy()
+    monkeypatch.setattr("builtins.__import__", monkey_no_numpy)
+    importlib.reload(yte.process)
+
+    result = _process(
+        """
+    __use_yte__: true
+    foo:
+        bar:
+            ?someval
+        baz:
+            ?5
+    """,
+        variables={"someval": ["a", "b", "c"]},
+    )
+    assert result == {"foo": {"bar": ["a", "b", "c"], "baz": 5}}

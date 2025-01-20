@@ -4,12 +4,12 @@ on: [push]
 
 jobs:
   formatting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -23,12 +23,12 @@ jobs:
         run: poetry run black --check .
 
   linting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -50,17 +50,24 @@ jobs:
       matrix:
         python-version: ["3.7", "3.9", "3.10"]
         poetry-version: ["1.1"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Setup poetry
         run: pip install poetry
+
+      # Workaround needed to solve numpy error:
+      # Backend 'setuptools.build_meta:__legacy__' is not available
+      # The error occurs with python 3.12
+      # TODO maybe remove in the future.
+      - name: Setup cython
+        run: pip install cython
 
       - name: Install Dependencies using Poetry
         run: poetry install
