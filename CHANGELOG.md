@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.6](https://github.com/yte-template-engine/yte/compare/v1.5.5...v1.5.6) (2025-01-20)
+
+
+### Bug Fixes
+
+* handle numpy strings in lists and dicts returned by expressions, auto-convert numpy ndarrays to equivalent lists ([#49](https://github.com/yte-template-engine/yte/issues/49)) ([7e648a1](https://github.com/yte-template-engine/yte/commit/7e648a107b435326b2aa19f70630834e95eb1b18))
+
 ## [1.5.5](https://github.com/yte-template-engine/yte/compare/v1.5.4...v1.5.5) (2024-12-09)
 
 
