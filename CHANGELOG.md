@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.7](https://github.com/yte-template-engine/yte/compare/v1.5.6...v1.5.7) (2025-02-05)
+
+
+### Bug Fixes
+
+* fix bug appearing with empty dicts ([#51](https://github.com/yte-template-engine/yte/issues/51)) ([33ab11f](https://github.com/yte-template-engine/yte/commit/33ab11f403736b775ad05b11b7f68e0ed667bd64))
+
 ## [1.5.6](https://github.com/yte-template-engine/yte/compare/v1.5.5...v1.5.6) (2025-01-20)
 
 
