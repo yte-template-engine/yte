@@ -99,6 +99,8 @@ def _process_dict(
     context: Context,
     disable_features: frozenset,
 ):
+    if not yaml_value:
+        return dict()
     items = list(_process_dict_items(yaml_value, variables, context, disable_features))
     if all(isinstance(item, dict) for item in items):
         result = dict()
