@@ -13,6 +13,28 @@ re_else = re.compile(r"^\?else$")
 FEATURES = frozenset(["variables", "definitions", "templates"])
 
 
+try:
+    import numpy as np
+
+    def _handle_numpy_str(value):
+        if isinstance(value, np.str_):
+            return str(value)
+        return value
+
+    def _handle_numpy_array(value):
+        if isinstance(value, np.ndarray):
+            return value.tolist()
+        return value
+
+except ImportError:
+
+    def _handle_numpy_str(value):
+        return value
+
+    def _handle_numpy_array(value):
+        return value
+
+
 def _process_yaml_value(
     yaml_value,
     variables: dict,
@@ -26,7 +48,18 @@ def _process_yaml_value(
         return result
     elif _is_expr(yaml_value):
         result = _process_expr(yaml_value, variables, context)
-        return result
+
+        result = _handle_numpy_array(result)
+
+        if isinstance(result, list):
+            return list(map(_handle_numpy_str, result))
+        elif isinstance(result, dict):
+            return {
+                _handle_numpy_str(key): _handle_numpy_str(value)
+                for key, value in result.items()
+            }
+        else:
+            return _handle_numpy_str(result)
     else:
         return yaml_value
 
@@ -68,6 +101,8 @@ def _process_dict(
     context: Context,
     disable_features: frozenset,
 ):
+    if not yaml_value:
+        return dict()
     items = list(_process_dict_items(yaml_value, variables, context, disable_features))
     if all(isinstance(item, dict) for item in items):
         result = dict()
