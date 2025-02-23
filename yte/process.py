@@ -75,6 +75,8 @@ def _process_dict(
     disable_features: frozenset,
     code_handler: CodeHandler,
 ):
+    if not yaml_value:
+        return dict()
     items = list(
         _process_dict_items(
             yaml_value, variables, context, disable_features, code_handler
