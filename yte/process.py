@@ -1,6 +1,7 @@
 import re
 from yte.context import Context
 
+from yte.code_handler import CodeHandler
 from yte.exceptions import YteError
 
 re_for_loop = re.compile(r"^\?for .+ in .+$")
@@ -11,53 +12,24 @@ re_else = re.compile(r"^\?else$")
 FEATURES = frozenset(["variables", "definitions"])
 
 
-try:
-    import numpy as np
-
-    def _handle_numpy_str(value):
-        if isinstance(value, np.str_):
-            return str(value)
-        return value
-
-    def _handle_numpy_array(value):
-        if isinstance(value, np.ndarray):
-            return value.tolist()
-        return value
-
-except ImportError:
-
-    def _handle_numpy_str(value):
-        return value
-
-    def _handle_numpy_array(value):
-        return value
-
-
 def _process_yaml_value(
     yaml_value,
     variables: dict,
     context: Context,
     disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
     if isinstance(yaml_value, dict):
-        return _process_dict(yaml_value, variables, Context(context), disable_features)
+        return _process_dict(
+            yaml_value, variables, Context(context), disable_features, code_handler
+        )
     elif isinstance(yaml_value, list):
-        result = _process_list(yaml_value, variables, context, disable_features)
+        result = _process_list(
+            yaml_value, variables, context, disable_features, code_handler
+        )
         return result
     elif _is_expr(yaml_value):
-        result = _process_expr(yaml_value, variables, context)
-
-        result = _handle_numpy_array(result)
-
-        if isinstance(result, list):
-            return list(map(_handle_numpy_str, result))
-        elif isinstance(result, dict):
-            return {
-                _handle_numpy_str(key): _handle_numpy_str(value)
-                for key, value in result.items()
-            }
-        else:
-            return _handle_numpy_str(result)
+        return _process_expr(yaml_value, variables, context, code_handler)
     else:
         return yaml_value
 
@@ -66,9 +38,9 @@ def _is_expr(yaml_value):
     return isinstance(yaml_value, str) and yaml_value.startswith("?")
 
 
-def _process_expr(yaml_value, variables, context: Context):
+def _process_expr(yaml_value, variables, context: Context, code_handler: CodeHandler):
     try:
-        return eval(yaml_value[1:], variables)
+        return code_handler.eval(yaml_value[1:], variables)
     except Exception as e:
         raise YteError(e, context)
 
@@ -78,6 +50,7 @@ def _process_list(
     variables,
     context: Context,
     disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
     variables["doc"]._insert(context, [])
 
@@ -85,7 +58,9 @@ def _process_list(
         for i, item in enumerate(yaml_value):
             _context = Context(context)
             _context.rendered.append(i)
-            value = _process_yaml_value(item, variables, _context, disable_features)
+            value = _process_yaml_value(
+                item, variables, _context, disable_features, code_handler
+            )
             if not isinstance(item, (dict, list)):
                 variables["doc"]._insert(_context, value)
             yield value
@@ -98,8 +73,13 @@ def _process_dict(
     variables,
     context: Context,
     disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
-    items = list(_process_dict_items(yaml_value, variables, context, disable_features))
+    items = list(
+        _process_dict_items(
+            yaml_value, variables, context, disable_features, code_handler
+        )
+    )
     if all(isinstance(item, dict) for item in items):
         result = dict()
         for item in items:
@@ -122,6 +102,7 @@ def _process_dict_items(
     variables,
     context: Context,
     disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
     conditional = Conditional()
 
@@ -131,49 +112,68 @@ def _process_dict_items(
         if key == "__definitions__":
             if "definitions" in disable_features:
                 raise YteError("__definitions__ have been disabled", key_context)
-            _process_definitions(value, variables, key_context)
+            _process_definitions(value, variables, key_context, code_handler)
         elif key == "__variables__":
             if "variables" in disable_features:
                 raise YteError("__variables__ have been disabled", key_context)
-            _process_variables(value, variables, key_context)
+            _process_variables(value, variables, key_context, code_handler)
         elif re_for_loop.match(key):
             yield from _process_for_loop(
-                key, value, variables, conditional, key_context, disable_features
+                key,
+                value,
+                variables,
+                conditional,
+                key_context,
+                disable_features,
+                code_handler,
             )
         elif re_if.match(key):
             yield from _process_if(
-                key, value, variables, conditional, key_context, disable_features
+                key,
+                value,
+                variables,
+                conditional,
+                key_context,
+                disable_features,
+                code_handler,
             )
         elif re_elif.match(key):
-            _process_elif(key, value, variables, conditional, key_context)
+            _process_elif(key, value, conditional, key_context)
         elif re_else.match(key):
             yield from _process_else(
-                value, variables, conditional, key_context, disable_features
+                value,
+                variables,
+                conditional,
+                key_context,
+                disable_features,
+                code_handler,
             )
         else:
             # a normal key that will end up in the result
             yield from conditional.process_conditional(
-                variables, key_context, disable_features
+                variables, key_context, disable_features, code_handler
             )
             key_result = _process_yaml_value(
-                key, variables, key_context, disable_features
+                key, variables, key_context, disable_features, code_handler
             )
             key_context.rendered.append(key_result)
 
             value_result = _process_yaml_value(
-                value, variables, key_context, disable_features
+                value, variables, key_context, disable_features, code_handler
             )
             variables["doc"]._insert(key_context, value_result)
 
             yield {key_result: value_result}
-    yield from conditional.process_conditional(variables, key_context, disable_features)
+    yield from conditional.process_conditional(
+        variables, key_context, disable_features, code_handler
+    )
 
 
-def _process_definitions(value, variables, context: Context):
+def _process_definitions(value, variables, context: Context, code_handler: CodeHandler):
     if isinstance(value, list):
         for item in value:
             try:
-                exec(item, variables)
+                code_handler.exec(item, variables)
             except Exception as e:
                 raise YteError(e, context)
     else:
@@ -182,11 +182,11 @@ def _process_definitions(value, variables, context: Context):
         )
 
 
-def _process_variables(value, variables, context: Context):
+def _process_variables(value, variables, context: Context, code_handler: CodeHandler):
     if isinstance(value, dict):
         for name, val in value.items():
             if _is_expr(val):
-                val = _process_expr(val, variables, context)
+                val = _process_expr(val, variables, context, code_handler)
             variables[name] = val
     else:
         raise YteError(
@@ -195,31 +195,48 @@ def _process_variables(value, variables, context: Context):
 
 
 def _process_for_loop(
-    key, value, variables, conditional, context: Context, disable_features: frozenset
+    key,
+    value,
+    variables,
+    conditional,
+    context: Context,
+    disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
-    yield from conditional.process_conditional(variables, context, disable_features)
+    yield from conditional.process_conditional(
+        variables, context, disable_features, code_handler
+    )
     _variables = dict(variables)
     _variables["_yte_value"] = value
     _variables["_context"] = context
     _variables["_disable_features"] = disable_features
     _variables["_yte_variables"] = _variables
-    yield from eval(
+    _variables["_code_handler"] = code_handler
+    yield from code_handler.eval(
         f"[_process_yaml_value(_yte_value, dict(_yte_variables, **locals()), "
-        "_context, _disable_features) "
+        "_context, _disable_features, _code_handler) "
         f"{key[1:]}]",
         _variables,
     )
 
 
 def _process_if(
-    key, value, variables, conditional, context: Context, disable_features: frozenset
+    key,
+    value,
+    variables,
+    conditional,
+    context: Context,
+    disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
-    yield from conditional.process_conditional(variables, context, disable_features)
+    yield from conditional.process_conditional(
+        variables, context, disable_features, code_handler
+    )
     expr = re_if.match(key).group("expr")
     conditional.register_if(expr, value)
 
 
-def _process_elif(key, value, variables, conditional, context: Context):
+def _process_elif(key, value, conditional, context: Context):
     if conditional.is_empty():
         raise YteError("Unexpected elif: no if or elif before", context)
     expr = re_elif.match(key).group("expr")
@@ -227,12 +244,19 @@ def _process_elif(key, value, variables, conditional, context: Context):
 
 
 def _process_else(
-    value, variables, conditional, context: Context, disable_features: frozenset
+    value,
+    variables,
+    conditional,
+    context: Context,
+    disable_features: frozenset,
+    code_handler: CodeHandler,
 ):
     if conditional.is_empty():
         raise YteError("Unexpected else: no if or elif before", context)
     conditional.register_else(value)
-    yield from conditional.process_conditional(variables, context, disable_features)
+    yield from conditional.process_conditional(
+        variables, context, disable_features, code_handler
+    )
 
 
 class Conditional:
@@ -241,7 +265,11 @@ class Conditional:
         self.values = []
 
     def process_conditional(
-        self, variables, context: Context, disable_features: frozenset
+        self,
+        variables,
+        context: Context,
+        disable_features: frozenset,
+        code_handler: CodeHandler,
     ):
         if not self.is_empty():
             variables = dict(variables)
@@ -249,8 +277,9 @@ class Conditional:
             variables["_yte_variables"] = variables
             variables["_context"] = context
             variables["_disable_features"] = disable_features
+            variables["_code_handler"] = code_handler
             try:
-                result = eval(self.conditional_expr(), variables)
+                result = code_handler.eval(self.conditional_expr(), variables)
             except Exception as e:
                 raise YteError(e, context)
             if result is not None:
@@ -262,13 +291,13 @@ class Conditional:
         if index < len(self.exprs):
             return (
                 f"_process_yaml_value({self.value_name(index)}, "
-                "_yte_variables, _context, _disable_features) "
+                "_yte_variables, _context, _disable_features, _code_handler) "
                 f"if {self.exprs[index]} else {self.conditional_expr(index + 1)}"
             )
         if index < len(self.values):
             return (
                 f"_process_yaml_value({self.value_name(index)}, "
-                "_yte_variables, _context, _disable_features)"
+                "_yte_variables, _context, _disable_features, _code_handler)"
             )
         else:
             return "None"
