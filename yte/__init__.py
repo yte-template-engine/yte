@@ -8,14 +8,18 @@ from yte.document import Document
 from yte.value_handler import ValueHandler
 
 
+DEFAULT_CODE_HANDLER = CodeHandler()
+DEFAULT_VALUE_HANDLER = ValueHandler()
+
+
 def process_yaml(
     file_or_str,
     outfile=None,
     variables=None,
     require_use_yte=False,
     disable_features=None,
-    code_handler: CodeHandler = CodeHandler(),
-    value_handler: ValueHandler = ValueHandler(),
+    code_handler: CodeHandler = DEFAULT_CODE_HANDLER,
+    value_handler: ValueHandler = DEFAULT_VALUE_HANDLER,
 ):
     """Process a YAML file or string with YTE,
     returning the processed version.
