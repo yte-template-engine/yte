@@ -2,8 +2,14 @@ import sys
 import yaml
 import plac
 from yte.context import Context
+from yte.code_handler import CodeHandler
 from yte.process import FEATURES, _process_yaml_value
 from yte.document import Document
+from yte.value_handler import ValueHandler
+
+
+DEFAULT_CODE_HANDLER = CodeHandler()
+DEFAULT_VALUE_HANDLER = ValueHandler()
 
 
 def process_yaml(
@@ -12,6 +18,8 @@ def process_yaml(
     variables=None,
     require_use_yte=False,
     disable_features=None,
+    code_handler: CodeHandler = DEFAULT_CODE_HANDLER,
+    value_handler: ValueHandler = DEFAULT_VALUE_HANDLER,
 ):
     """Process a YAML file or string with YTE,
     returning the processed version.
@@ -24,6 +32,8 @@ def process_yaml(
       statement in the top level of the document
     * disable_features - list of features that should be disabled during rendering.
       Possible values to choose from are ["definitions", "variables"]
+    * code_handler - instance of CodeHandler to use during rendering for evaluating expressions
+    * value_handler - instance of ValueHandler to use during rendering for postprocessing values
     """
     if variables is None:
         variables = dict()
@@ -60,7 +70,10 @@ def process_yaml(
             variables,
             context=Context(),
             disable_features=disable_features,
+            code_handler=code_handler,
         )
+
+        result = value_handler.postprocess(result)
     else:
         # do not process document since use_yte is required but not found in document
         result = yaml_doc
