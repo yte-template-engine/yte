@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/yte-template-engine/yte/compare/v1.6.0...v1.7.0) (2025-02-24)
+
+
+### Features
+
+* marker for skipping items in list ([#55](https://github.com/yte-template-engine/yte/issues/55)) ([b166735](https://github.com/yte-template-engine/yte/commit/b1667352cf2d691ed82c22e7369029438b941456))
+
 ## [1.6.0](https://github.com/yte-template-engine/yte/compare/v1.5.7...v1.6.0) (2025-02-24)
 
 
