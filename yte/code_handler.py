@@ -6,8 +6,8 @@ class CodeHandler:
         self._eval_func = eval_func
         self._exec_func = exec_func
 
-    def eval(self, expr, variables: Dict[str, Any]):
+    def eval(self, expr: str, variables: Dict[str, Any]) -> None:
         return self._eval_func(expr, variables)
 
-    def exec(self, source, variables: Dict[str, Any]):
+    def exec(self, source: str, variables: Dict[str, Any]) -> None:
         return self._exec_func(source, variables)
