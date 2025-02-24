@@ -39,10 +39,5 @@ class ValueHandler:
         value = _handle_numpy_array(value)
         if isinstance(value, list):
             return list(map(_handle_numpy_str, value))
-        elif isinstance(value, dict):
-            return {
-                _handle_numpy_str(key): _handle_numpy_str(value)
-                for key, value in value.items()
-            }
         else:
             return _handle_numpy_str(value)

@@ -573,7 +573,7 @@ def test_numpy_2d_array():
 
 def test_numpy_missing(monkeypatch):
     monkeypatch.setattr("builtins.__import__", monkey_no_numpy)
-    importlib.reload(yte.process)
+    importlib.reload(yte.value_handler)
 
     result = _process(
         """
@@ -583,7 +583,11 @@ def test_numpy_missing(monkeypatch):
             ?someval
         baz:
             ?5
+        buz:
+            ?someotherval
     """,
-        variables={"someval": ["a", "b", "c"]},
+        variables={"someval": ["a", "b", "c"], "someotherval": {"a": 1, "b": 2}},
     )
-    assert result == {"foo": {"bar": ["a", "b", "c"], "baz": 5}}
+    assert result == {
+        "foo": {"bar": ["a", "b", "c"], "baz": 5, "buz": {"a": 1, "b": 2}}
+    }
