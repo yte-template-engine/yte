@@ -591,3 +591,18 @@ def test_numpy_missing(monkeypatch):
     assert result == {
         "foo": {"bar": ["a", "b", "c"], "baz": 5, "buz": {"a": 1, "b": 2}}
     }
+
+
+def test_skip_in_list():
+    result = _process(
+        """
+    foo:
+        - ?SKIP
+        - bar
+        - ?if True:
+            ?SKIP
+          ?else:
+            15
+    """
+    )
+    assert result == {"foo": ["bar"]}

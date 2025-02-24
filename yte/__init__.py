@@ -3,7 +3,7 @@ import yaml
 import plac
 from yte.context import Context
 from yte.code_handler import CodeHandler
-from yte.process import FEATURES, _process_yaml_value
+from yte.process import FEATURES, SKIP, _process_yaml_value
 from yte.document import Document
 from yte.value_handler import ValueHandler
 
@@ -41,6 +41,7 @@ def process_yaml(
     doc = Document()
     variables["doc"] = doc
     variables["this"] = doc
+    variables["SKIP"] = SKIP
 
     try:
         yaml_doc = yaml.load(file_or_str, Loader=yaml.FullLoader)
