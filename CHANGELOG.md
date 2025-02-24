@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/yte-template-engine/yte/compare/v1.5.7...v1.6.0) (2025-02-24)
+
+
+### Features
+
+* introduce ValueHandler for postprocessing results and CodeHandler for evaluating expressions ([#53](https://github.com/yte-template-engine/yte/issues/53)) ([caf84ae](https://github.com/yte-template-engine/yte/commit/caf84ae571c9e3e3b69d7ea7a08cd84dbd2d888c))
+
 ## [1.5.7](https://github.com/yte-template-engine/yte/compare/v1.5.6...v1.5.7) (2025-02-05)
 
 
