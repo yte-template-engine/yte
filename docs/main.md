@@ -92,6 +92,19 @@ foo: 1
 foo: true
 ```
 
+### Skipping items in lists
+
+In case one wants to conditionally skip items of a list, the `SKIP` marker can be used:
+
+```yaml
+- foo
+- bar
+- ?if something > 5:
+    ?SKIP
+  ?else:
+    baz
+```
+
 ### Accessing already rendered document parts
 
 A globally available object `this` (a wrapper around a Python dict)

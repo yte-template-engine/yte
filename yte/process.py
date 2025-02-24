@@ -10,6 +10,7 @@ re_elif = re.compile(r"^\?elif (?P<expr>.+)$")
 re_else = re.compile(r"^\?else$")
 
 FEATURES = frozenset(["variables", "definitions"])
+SKIP = object()
 
 
 def _process_yaml_value(
@@ -63,7 +64,8 @@ def _process_list(
             )
             if not isinstance(item, (dict, list)):
                 variables["doc"]._insert(_context, value)
-            yield value
+            if value is not SKIP:
+                yield value
 
     return list(_process())
 
