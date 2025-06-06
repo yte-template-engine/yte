@@ -117,7 +117,8 @@ def _process_dict(
                         result.update(value)
                     else:
                         raise YteError(
-                            f"Merge operator '<:' as key in a map must be followed by a map, found {type(value)}",
+                            "Merge operator '<:' as key in a map must be followed "
+                            f"by a map, found {type(value)}",
                             context,
                         )
                 else:

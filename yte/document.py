@@ -73,7 +73,7 @@ class Document(Subdocument):
             inner = inner[key]
 
         if isinstance(inner, list):
-            _i = context.rendered[-1]
+            # i = context.rendered[-1]
             # TODO the assertion below fails with nested for loops in lists
             # however, commenting it out makes the document correct
             # It feels problematic though to just remove the assertion!

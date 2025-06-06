@@ -619,7 +619,7 @@ def test_merge_nested_list_loop():
                 - ?i
     """
     )
-    result == {"foo": ["bar", "baz", 0, 1]}
+    assert result == {"foo": ["bar", "baz", 0, 1]}
 
 
 def test_merge_nested_list():
@@ -671,7 +671,7 @@ def test_merge_nested_dict():
         bar: 1
         <:
             baz: 2
-            qux: 3 
+            qux: 3
     """
     )
     assert result == {"foo": {"bar": 1, "baz": 2, "qux": 3}}
@@ -682,7 +682,7 @@ def test_merge_nested_dict_toplevel():
         """
     <:
         baz: 2
-        qux: 3 
+        qux: 3
     """
     )
     assert result == {"baz": 2, "qux": 3}
