@@ -606,3 +606,94 @@ def test_skip_in_list():
     """
     )
     assert result == {"foo": ["bar"]}
+
+
+def test_merge_nested_list_loop():
+    result = _process(
+        """
+    foo:
+        - bar
+        - baz
+        - <:
+            ?for i in range(2):
+                - ?i
+    """
+    )
+    result == {"foo": ["bar", "baz", 0, 1]}
+
+
+def test_merge_nested_list():
+    result = _process(
+        """
+    foo:
+        - bar
+        - baz
+        - <:
+            - 1
+            - 2
+        - sub: 3
+    """
+    )
+    assert result == {"foo": ["bar", "baz", 1, 2, {"sub": 3}]}
+
+
+def test_merge_nested_list_multikey_fail():
+    with pytest.raises(YteError):
+        _process(
+            """
+        foo:
+            - bar
+            - baz
+            - <:
+                - 1
+                - 2
+              sub: 3
+        """
+        )
+
+
+def test_merge_nested_list_no_list_type():
+    with pytest.raises(YteError):
+        _process(
+            """
+        foo:
+            - bar
+            - baz
+            - <: 2
+        """
+        )
+
+
+def test_merge_nested_dict():
+    result = _process(
+        """
+    foo:
+        bar: 1
+        <:
+            baz: 2
+            qux: 3 
+    """
+    )
+    assert result == {"foo": {"bar": 1, "baz": 2, "qux": 3}}
+
+
+def test_merge_nested_dict_toplevel():
+    result = _process(
+        """
+    <:
+        baz: 2
+        qux: 3 
+    """
+    )
+    assert result == {"baz": 2, "qux": 3}
+
+
+def test_merge_nested_dict_no_dict_fail():
+    with pytest.raises(YteError):
+        _process(
+            """
+        foo:
+            bar: 1
+            <: 2
+        """
+        )

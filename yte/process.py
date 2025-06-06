@@ -1,4 +1,5 @@
 import re
+from typing import Any
 from yte.context import Context
 
 from yte.code_handler import CodeHandler
@@ -19,7 +20,7 @@ def _process_yaml_value(
     context: Context,
     disable_features: frozenset,
     code_handler: CodeHandler,
-):
+) -> Any:
     if isinstance(yaml_value, dict):
         return _process_dict(
             yaml_value, variables, Context(context), disable_features, code_handler
@@ -59,13 +60,35 @@ def _process_list(
         for i, item in enumerate(yaml_value):
             _context = Context(context)
             _context.rendered.append(i)
-            value = _process_yaml_value(
-                item, variables, _context, disable_features, code_handler
-            )
-            if not isinstance(item, (dict, list)):
-                variables["doc"]._insert(_context, value)
-            if value is not SKIP:
-                yield value
+
+            if isinstance(item, dict) and "<" in item:
+                if len(item) == 1:
+                    nested = item["<"]
+                    value = _process_yaml_value(
+                        nested, variables, _context, disable_features, code_handler
+                    )
+                    if isinstance(value, list):
+                        yield from value
+                    else:
+                        raise YteError(
+                            "Merge operator '<:' within a list must be followed by "
+                            f"a list, found {type(value)}",
+                            _context,
+                        )
+                else:
+                    raise YteError(
+                        "Merge operator '<:' within a list must be the only key in "
+                        f"its map, found keys {item.keys()}",
+                        _context,
+                    )
+            else:
+                value = _process_yaml_value(
+                    item, variables, _context, disable_features, code_handler
+                )
+                if not isinstance(item, (dict, list)):
+                    variables["doc"]._insert(_context, value)
+                if value is not SKIP:
+                    yield value
 
     return list(_process())
 
@@ -87,7 +110,18 @@ def _process_dict(
     if all(isinstance(item, dict) for item in items):
         result = dict()
         for item in items:
-            result.update(item)
+            for key, value in item.items():
+                if key == "<":
+                    if isinstance(value, dict):
+                        # merge dictionaries
+                        result.update(value)
+                    else:
+                        raise YteError(
+                            f"Merge operator '<:' as key in a map must be followed by a map, found {type(value)}",
+                            context,
+                        )
+                else:
+                    result[key] = value
         return result
     elif all(isinstance(item, list) for item in items):
         return [item for sublist in items for item in sublist]
