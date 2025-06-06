@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/yte-template-engine/yte/compare/v1.7.0...v1.8.0) (2025-06-06)
+
+
+### Features
+
+* introduce merge operator for nested lists and maps ([#58](https://github.com/yte-template-engine/yte/issues/58)) ([afc058f](https://github.com/yte-template-engine/yte/commit/afc058f052df3c94bfed69223e0d7263aa4ba596))
+
 ## [1.7.0](https://github.com/yte-template-engine/yte/compare/v1.6.0...v1.7.0) (2025-02-24)
 
 
