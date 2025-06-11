@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/yte-template-engine/yte/compare/v1.8.0...v1.8.1) (2025-06-11)
+
+
+### Bug Fixes
+
+* fix index out of bounds issue in merge operator ([#60](https://github.com/yte-template-engine/yte/issues/60)) ([fcc7266](https://github.com/yte-template-engine/yte/commit/fcc726680a296d4ca630c33f179d557827d4f378))
+
 ## [1.8.0](https://github.com/yte-template-engine/yte/compare/v1.7.0...v1.8.0) (2025-06-06)
 
 
