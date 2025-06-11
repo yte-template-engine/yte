@@ -44,7 +44,7 @@ def _process_expr(yaml_value, variables, context: Context, code_handler: CodeHan
     try:
         return code_handler.eval(yaml_value[1:], variables)
     except Exception as e:
-        raise YteError(e, context)
+        raise YteError(f"{e.__class__.__name__}: {e}", context)
 
 
 def _process_list(

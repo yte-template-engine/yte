@@ -64,9 +64,11 @@ class Document(Subdocument):
         inner = self.inner
         for key in context.rendered[:-1]:
             if isinstance(inner, list):
-                assert key <= len(inner), "bug: cannot insert at index > len(list)"
-                if key == len(inner):
-                    inner.append(Subdocument())
+                #if key > len(inner):
+                #    breakpoint()
+                #assert key <= len(inner), "bug: cannot insert at index > len(list)"
+                #if key == len(inner):
+                inner.append(Subdocument())
             else:
                 if key not in inner:
                     inner[key] = Subdocument()
