@@ -64,22 +64,13 @@ class Document(Subdocument):
         inner = self.inner
         for key in context.rendered[:-1]:
             if isinstance(inner, list):
-                assert key <= len(inner), "bug: cannot insert at index > len(list)"
-                if key == len(inner):
-                    inner.append(Subdocument())
+                inner.append(Subdocument())
             else:
                 if key not in inner:
                     inner[key] = Subdocument()
             inner = inner[key]
 
         if isinstance(inner, list):
-            # i = context.rendered[-1]
-            # TODO the assertion below fails with nested for loops in lists
-            # however, commenting it out makes the document correct
-            # It feels problematic though to just remove the assertion!
-            # The problem seems that the i in rendered[-1] just increases into the
-            # nesting instead of starting over?
-            # assert isinstance(i, int) and i == len(inner), f"bug: cannot append: {i}"
             inner.append(value)
         else:
             inner[context.rendered[-1]] = value

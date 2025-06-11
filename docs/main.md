@@ -94,7 +94,9 @@ foo: true
 
 ### Skipping items in lists
 
-In case one wants to conditionally skip items of a list, the `SKIP` marker can be used:
+In case one wants to conditionally skip items of a list, the `SKIP` marker can be used (below assuming that `something > 5` is `True`):
+
+<!-- template -->
 
 ```yaml
 - foo
@@ -103,6 +105,13 @@ In case one wants to conditionally skip items of a list, the `SKIP` marker can b
     ?SKIP
   ?else:
     baz
+```
+
+<!-- rendered -->
+
+```yaml
+- foo
+- bar
 ```
 
 ### Accessing already rendered document parts
@@ -276,7 +285,9 @@ foo:
   <:
     baz: 2
 ```
+
 <!-- rendered -->
+
 ```yaml
 foo:
   bar: 1

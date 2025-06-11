@@ -697,3 +697,26 @@ def test_merge_nested_dict_no_dict_fail():
             <: 2
         """
         )
+
+
+def test_merge_nested_list_index_access():
+    result = _process(
+        """
+        x:
+            - a1
+            - a2
+            - a3
+            - <:
+                ?for i in range(4, 7):
+                  - ?f"a{i}"
+        y1: ?this["x"][1]
+        y2: ?this["x"][4]
+        y3: ?this["x"][5]
+        """
+    )
+    assert result == {
+        "x": ["a1", "a2", "a3", "a4", "a5", "a6"],
+        "y1": "a2",
+        "y2": "a5",
+        "y3": "a6",
+    }
