@@ -98,15 +98,13 @@ class Settings:
     this will wait forever.
     """
 
-    require_use_yte: bool = (
-        False  # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
-    )
-    variable_file: Optional[Path] = (
-        None  # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
-    )
-    variables: Optional[List[str]] = (
-        None  # Variables to use in the template, given as space separated name=value pairs.
-    )
+    require_use_yte: bool = False  # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
+    variable_file: Optional[
+        Path
+    ] = None  # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
+    variables: Optional[
+        List[str]
+    ] = None  # Variables to use in the template, given as space separated name=value pairs.
 
 
 def main():
