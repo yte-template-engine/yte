@@ -76,13 +76,14 @@ class Cli:
     args: argparse_dataclass.OptionsType
 
     def handle_args(self):
-        self.handle_version()
-        self.handle_process()
+        if not self.handle_version():
+            self.handle_process()
 
-    def handle_version(self):
+    def handle_version(self) -> bool:
         if self.args.version:
             print(importlib.metadata.version("yte"))
-            sys.exit(0)
+            return True
+        return False
 
     def handle_process(self):
         variables = {}
@@ -133,6 +134,3 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
     Cli(args).handle_args()
-
-if __name__ == "__main__":
-    main()

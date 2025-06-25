@@ -39,8 +39,10 @@ omit = [".*", "*/site-packages/*"]
 # exclude CLI handling lines. They cannot be captured properly by coverage, but we have a testcase for them.
 exclude_lines = [
   "yaml\\.dump\\(result, outfile\\)",
-  "process_yaml\\(sys.stdin, outfile=sys\\.stdout\\)",
-  "plac.call\\(cli\\)",
+  "process_yaml\\(sys\\.stdin, outfile=sys\\.stdout\\)",
+  "parser = get_argument_parser()",
+  "args = parser\\.parse_args\\(\\)",
+  "Cli\\(args\\)\\.handle_args\\(\\)",
 ]
 omit = ["tests.py"]
 fail_under = 100
