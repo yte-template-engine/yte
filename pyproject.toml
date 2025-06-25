@@ -12,6 +12,7 @@ dependencies = [
   "dpath >=2.1,<3.0",
   "plac >=1.3.4,<2.0",
   "pyyaml >=6.0,<7.0",
+  "simple-parsing>=0.1.5",
 ]
 
 [project.urls]
