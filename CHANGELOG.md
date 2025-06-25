@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/yte-template-engine/yte/compare/v1.8.1...v1.9.0) (2025-06-25)
+
+
+### Features
+
+* add --variables and --variable-file to pass variables to the CLI ([#62](https://github.com/yte-template-engine/yte/issues/62)) ([6b1fc18](https://github.com/yte-template-engine/yte/commit/6b1fc18fe37a649b5577e44b5180d346d07dbd0c))
+
 ## [1.8.1](https://github.com/yte-template-engine/yte/compare/v1.8.0...v1.8.1) (2025-06-11)
 
 
