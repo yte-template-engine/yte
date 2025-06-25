@@ -5,6 +5,7 @@ from typing import Any, List, Optional, Tuple
 import json
 import yaml
 import simple_parsing
+from simple_parsing.helpers import flag
 from yte.context import Context
 from yte.code_handler import CodeHandler
 from yte.process import FEATURES, SKIP, _process_yaml_value
@@ -98,17 +99,26 @@ class Settings:
     this will wait forever.
     """
 
-    require_use_yte: bool = False  # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
+    # Require that the document contains a `__use_yte__: true` statement at the top 
+    # level. If the statement is not present or false, return document unprocessed 
+    # (except removing the `__use_yte__: false` statement if present).
+    require_use_yte: bool = flag(default=False, action="store_true")
+    
+    # File containing map of variables to use in the template (JSON or YAML format).
+    # Values given here are overwritten by values for the same names in the --variables
+    # option.
     variable_file: Optional[
         Path
-    ] = None  # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
+    ] = None
+    
+    # Variables to use in the template, given as space separated name=value pairs.
     variables: Optional[
         List[str]
-    ] = None  # Variables to use in the template, given as space separated name=value pairs.
+    ] = None
 
 
 def main():
-    settings = simple_parsing.parse(Settings)
+    settings = simple_parsing.parse(Settings, add_option_string_dash_variants=simple_parsing.DashVariant.DASH)
 
     variables = {}
 
