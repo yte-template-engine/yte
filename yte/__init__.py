@@ -101,7 +101,7 @@ class Settings:
     require_use_yte: bool = (
         False  # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
     )
-    variables_file: Optional[Path] = (
+    variable_file: Optional[Path] = (
         None  # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
     )
     variables: Optional[List[str]] = (
@@ -114,7 +114,7 @@ def main():
 
     variables = {}
 
-    if settings.variables_file is not None:
+    if settings.variable_file is not None:
 
         def handle_mapping(loaded: Any):
             if not isinstance(loaded, dict):
@@ -123,11 +123,11 @@ def main():
                 )
             variables.update(loaded)
 
-        if settings.variables_file.suffix in [".yaml", ".yml"]:
-            with open(settings.variables_file, "r") as f:
+        if settings.variable_file.suffix in [".yaml", ".yml"]:
+            with open(settings.variable_file, "r") as f:
                 handle_mapping(yaml.load(f, Loader=yaml.SafeLoader))
-        elif settings.variables_file.suffix == ".json":
-            with open(settings.variables_file, "r") as f:
+        elif settings.variable_file.suffix == ".json":
+            with open(settings.variable_file, "r") as f:
                 handle_mapping(json.load(f))
         else:
             raise ValueError(
