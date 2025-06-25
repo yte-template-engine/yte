@@ -356,8 +356,10 @@ yte --help
 It can be used to process a YTE template from STDIN and prints the rendered version to STDOUT:
 
 ```bash
-yte < template.yaml > rendered.yaml
+yte --variables foo=4 < template.yaml > rendered.yaml
 ```
+
+Variables can be passed via the `--variables` argument, or given as a `JSON` or `YAML` file using `--variable-file`.
 
 ## Comparison with other engines
 
