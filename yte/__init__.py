@@ -97,9 +97,16 @@ class Settings:
     Note: if nothing is provided at STDIN,
     this will wait forever.
     """
-    require_use_yte: bool = False # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
-    variables_file: Optional[Path] = None # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
-    variables: Optional[List[str]] = None # Variables to use in the template, given as space separated name=value pairs.
+
+    require_use_yte: bool = (
+        False  # Require that the document contains a `__use_yte__: true` statement at the top level. If the statement is not present or false, return document unprocessed (except removing the `__use_yte__: false` statement if present)
+    )
+    variables_file: Optional[Path] = (
+        None  # File containing map of variables to use in the template (JSON or YAML format). Values given here are overwritten by values for the same names in the --variables option.
+    )
+    variables: Optional[List[str]] = (
+        None  # Variables to use in the template, given as space separated name=value pairs.
+    )
 
 
 def main():
@@ -108,10 +115,14 @@ def main():
     variables = {}
 
     if settings.variables_file is not None:
+
         def handle_mapping(loaded: Any):
             if not isinstance(loaded, dict):
-                raise ValueError("Variables file must contain a YAML mapping (dictionary).")
+                raise ValueError(
+                    "Variables file must contain a YAML mapping (dictionary)."
+                )
             variables.update(loaded)
+
         if settings.variables_file.suffix in [".yaml", ".yml"]:
             with open(settings.variables_file, "r") as f:
                 handle_mapping(yaml.load(f, Loader=yaml.SafeLoader))
@@ -119,13 +130,16 @@ def main():
             with open(settings.variables_file, "r") as f:
                 handle_mapping(json.load(f))
         else:
-            raise ValueError("Unsupported file format for variables file. Use .yaml or .json.")
+            raise ValueError(
+                "Unsupported file format for variables file. Use .yaml or .json."
+            )
     if settings.variables is not None:
+
         def parse_item(item: str) -> Tuple[str, Any]:
             key, value = item.split("=", 1)
             value = yaml.load(value, Loader=yaml.SafeLoader)
             return key, value
+
         variables.update(parse_item(item) for item in settings.variables)
 
     process_yaml(sys.stdin, outfile=sys.stdout, variables=variables)
-
