@@ -1,5 +1,7 @@
 import builtins
 import importlib
+import json
+from pathlib import Path
 import tempfile
 import yte
 import textwrap
@@ -720,3 +722,47 @@ def test_merge_nested_list_index_access():
         "y2": "a5",
         "y3": "a6",
     }
+
+
+def test_cli():
+    with tempfile.NamedTemporaryFile(mode="w") as tmp, tempfile.NamedTemporaryFile(
+        mode="w", delete=False
+    ) as tmp_out, tempfile.NamedTemporaryFile(mode="w", suffix=".json") as tmp_vars:
+        tmp.write(
+            textwrap.dedent(
+                """
+                foo: ?var1
+                bar: ?var2
+                baz: ?var3
+                """
+            )
+        )
+        json.dump({"var1": 0, "var2": 2, "var3": 3}, tmp_vars)
+
+        tmp.flush()
+        tmp_vars.flush()
+
+        sp.run(
+            [
+                "yte",
+                "--template",
+                tmp.name,
+                "--output",
+                tmp_out.name,
+                "--variables",
+                "var1=1",
+                "var2=2",
+                "--variable-file",
+                tmp_vars.name,
+            ],
+            check=True,
+        )
+        tmp_out.close()
+
+        with open(tmp_out.name, "r") as tmp_out:
+            assert yaml.load(tmp_out, Loader=yaml.SafeLoader) == {
+                "foo": 1,
+                "bar": 2,
+                "baz": 3,
+            }
+        Path(tmp_out.name).unlink()
