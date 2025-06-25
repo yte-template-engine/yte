@@ -1,4 +1,4 @@
 __pycache__/
-poetry.lock
+uv.lock
 .coverage
 dist/

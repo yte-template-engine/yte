@@ -1,6 +1,4 @@
-import sys
 import yaml
-import plac
 from yte.context import Context
 from yte.code_handler import CodeHandler
 from yte.process import FEATURES, SKIP, _process_yaml_value
@@ -83,25 +81,3 @@ def process_yaml(
         yaml.dump(result, outfile, sort_keys=False)
     else:
         return result
-
-
-@plac.flg(
-    "require_use_yte",
-    "Require that the document contains a `__use_yte__: true` statement at the top level. "
-    "If the statement is not present or false, return document unprocessed "
-    "(except removing the `__use_yte__: false` statement if present)",
-)
-def cli(
-    require_use_yte=False,
-):
-    """Process a YAML file given at STDIN with YTE,
-    and print the result to STDOUT.
-
-    Note: if nothing is provided at STDIN,
-    this will wait forever.
-    """
-    process_yaml(sys.stdin, outfile=sys.stdout)
-
-
-def main():
-    plac.call(cli)

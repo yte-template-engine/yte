@@ -1,7 +1,10 @@
 import builtins
 import importlib
+import json
+from pathlib import Path
 import tempfile
 import yte
+import yte.cli
 import textwrap
 import pytest
 import yaml
@@ -720,3 +723,94 @@ def test_merge_nested_list_index_access():
         "y2": "a5",
         "y3": "a6",
     }
+
+
+def _cli(args):
+    args = yte.cli.get_argument_parser().parse_args(args)
+    yte.cli.Cli(args).handle_args()
+
+
+def _test_cli(
+    template,
+    variables_for_file=None,
+    variables_for_args=None,
+    expected_output=None,
+    variable_file_format="json",
+):
+    with tempfile.NamedTemporaryFile(mode="w") as tmp, tempfile.NamedTemporaryFile(
+        mode="w", delete=False
+    ) as tmp_out, tempfile.NamedTemporaryFile(
+        mode="w", suffix=f".{variable_file_format}"
+    ) as tmp_vars:
+        tmp.write(textwrap.dedent(template))
+        if variable_file_format == "json":
+            json.dump(variables_for_file, tmp_vars)
+        elif variable_file_format == "yaml":
+            yaml.dump(variables_for_file, tmp_vars)
+        # empty file in the else case
+
+        tmp.flush()
+        tmp_vars.flush()
+
+        _cli(
+            [
+                "--template",
+                tmp.name,
+                "--output",
+                tmp_out.name,
+                "--variable-file",
+                tmp_vars.name,
+                "--variables",
+            ]
+            + [f"{key}={value}" for key, value in (variables_for_args or {}).items()]
+        )
+
+        tmp_out.close()
+
+        with open(tmp_out.name, "r") as tmp_out:
+            assert yaml.load(tmp_out, Loader=yaml.SafeLoader) == expected_output
+        Path(tmp_out.name).unlink()
+
+
+def test_cli_version():
+    _cli(["--version"])
+
+
+@pytest.mark.parametrize("variable_file_format", ["json", "yaml"])
+def test_cli_success(variable_file_format):
+    _test_cli(
+        """
+        foo: ?var1
+        bar: ?var2
+        baz: ?var3
+        """,
+        variables_for_file={"var1": 0, "var2": 2, "var3": 3},
+        variables_for_args={"var1": 1, "var2": 2},
+        expected_output={
+            "foo": 1,
+            "bar": 2,
+            "baz": 3,
+        },
+        variable_file_format=variable_file_format,
+    )
+
+
+def test_cli_invalid_variable_file_format():
+    with pytest.raises(ValueError):
+        _test_cli(
+            """
+            foo: ?var1
+            """,
+            variables_for_file={"var1": 1.2},
+            variable_file_format="txt",
+        )
+
+
+def test_cli_invalid_variables_file():
+    with pytest.raises(ValueError):
+        _test_cli(
+            """
+            foo: ?var1
+            """,
+            variables_for_file=[1.2, 3],
+        )

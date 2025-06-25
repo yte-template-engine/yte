@@ -9,8 +9,8 @@ readme = "README.md"
 version = "1.8.1"
 requires-python = ">=3.7,<4.0"
 dependencies = [
+  "argparse-dataclass>=1.0.0",
   "dpath >=2.1,<3.0",
-  "plac >=1.3.4,<2.0",
   "pyyaml >=6.0,<7.0",
 ]
 
@@ -18,15 +18,18 @@ dependencies = [
 repository = "https://github.com/yte-template-engine/yte"
 homepage = "https://github.com/yte-template-engine/yte"
 
-[tool.poetry.group.dev.dependencies]
-black = "^22.1.0"
-coverage = {extras = ["toml"], version = "^6.3.1"}
-flake8 = "^4.0.1"
-flake8-bugbear = "^22.1.11"
-pytest = "^7.0"
-numpy = [
-  {version = ">=2.0", python = ">=3.10"},
-  {version = "<2.0", python = "<3.10" },
+[project.scripts]
+yte = "yte.cli:main"
+
+[dependency-groups]
+dev = [
+  "black",
+  "coverage[toml]",
+  "flake8",
+  "flake8-bugbear",
+  "pytest",
+  "numpy >=2.0; python_version >='3.10'",
+  "numpy <2.0; python_version <'3.10'",
 ]
 
 [tool.coverage.run]
@@ -36,15 +39,14 @@ omit = [".*", "*/site-packages/*"]
 # exclude CLI handling lines. They cannot be captured properly by coverage, but we have a testcase for them.
 exclude_lines = [
   "yaml\\.dump\\(result, outfile\\)",
-  "process_yaml\\(sys.stdin, outfile=sys\\.stdout\\)",
-  "plac.call\\(cli\\)",
+  "process_yaml\\(sys\\.stdin, outfile=sys\\.stdout\\)",
+  "parser = get_argument_parser()",
+  "args = parser\\.parse_args\\(\\)",
+  "Cli\\(args\\)\\.handle_args\\(\\)",
 ]
 omit = ["tests.py"]
 fail_under = 100
 
-[tool.poetry.scripts]
-yte = "yte:main"
-
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["uv_build"]
+build-backend = "uv_build"

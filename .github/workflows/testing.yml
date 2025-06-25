@@ -9,18 +9,9 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
+      - uses: astral-sh/setup-uv@v5
 
-      - name: Setup poetry
-        run: pip install poetry
-
-      - name: Install Dependencies using Poetry
-        run: poetry install
-
-      - name: Check formatting
-        run: poetry run black --check .
+      - run: uv run black --check .
 
   linting:
     runs-on: ubuntu-22.04
@@ -28,18 +19,9 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
+      - uses: astral-sh/setup-uv@v5
 
-      - name: Setup poetry
-        run: pip install poetry
-
-      - name: Install Dependencies using Poetry
-        run: poetry install
-
-      - name: Check code
-        run: poetry run flake8
+      - run: uv run flake8 src/yte
 
   testing:
     needs:
@@ -55,27 +37,12 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup poetry
-        run: pip install poetry
-
-      # Workaround needed to solve numpy error:
-      # Backend 'setuptools.build_meta:__legacy__' is not available
-      # The error occurs with python 3.12
-      # TODO maybe remove in the future.
-      - name: Install numpy dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential libblas-dev liblapack-dev gfortran
-      - name: Setup cython
-        run: pip install cython
-
-      - name: Install Dependencies using Poetry
-        run: poetry install
-
       - name: Run pytest
-        run: poetry run coverage run -m pytest tests.py
+        run: uv run coverage run -m pytest
 
       - name: Run Coverage
-        run: poetry run coverage report -m
+        run: uv run coverage report -m
