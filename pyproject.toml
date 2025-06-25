@@ -6,7 +6,7 @@ description = "A YAML template engine with Python expressions"
 license = "MIT"
 name = "yte"
 readme = "README.md"
-version = "1.8.1"
+version = "1.9.0"
 requires-python = ">=3.7,<4.0"
 dependencies = [
   "argparse-dataclass>=1.0.0",
