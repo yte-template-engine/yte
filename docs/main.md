@@ -361,6 +361,12 @@ yte --variables foo=4 < template.yaml > rendered.yaml
 
 Variables can be passed via the `--variables` argument, or given as a `JSON` or `YAML` file using `--variable-file`.
 
+### Security
+
+YTE will not sandbox or restrict expressions given via `?`-expressions.
+Any kind of security measures have to be taken in the place where the library is used.
+Consequently, one should not directly pass user input into `?`-expressions without applying further measures like sandboxing the execution or static code analysis.
+
 ## Comparison with other engines
 
 Lots of template engines are available, for example the famous generic [jinja2](https://jinja.palletsprojects.com).
