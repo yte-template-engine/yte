@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.1](https://github.com/yte-template-engine/yte/compare/v1.9.0...v1.9.1) (2025-11-24)
+
+
+### Bug Fixes
+
+* constrain argparse-dataclass dependency ([e0647f2](https://github.com/yte-template-engine/yte/commit/e0647f2c7ccf82b43fbb70ee4fb4a15f5c53d2ff))
+* use uv for publishing ([bf39d8b](https://github.com/yte-template-engine/yte/commit/bf39d8b9e648bbb593671a28b9edf36b094a2c7f))
+
+
+### Documentation
+
+* security note ([6aaadd5](https://github.com/yte-template-engine/yte/commit/6aaadd5aa81c32b3e86e412a5ca8515559cee5ab))
+
 ## [1.9.0](https://github.com/yte-template-engine/yte/compare/v1.8.1...v1.9.0) (2025-06-25)
 
 
