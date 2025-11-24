@@ -23,20 +23,9 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-
-      - name: Install poetry
-        run: pip install poetry
-
-      - name: Install Dependencies using Poetry
-        run: poetry install
+      - uses: astral-sh/setup-uv@v5
 
       - name: Publish to PyPi
-        env:
-          PYPI_USERNAME: __token__
-          PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: poetry publish --build --username $PYPI_USERNAME --password $PYPI_PASSWORD
+        run: uv publish
