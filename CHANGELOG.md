@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.3](https://github.com/yte-template-engine/yte/compare/v1.9.2...v1.9.3) (2025-11-25)
+
+
+### Bug Fixes
+
+* first build, then publish ([5fd7089](https://github.com/yte-template-engine/yte/commit/5fd708956b2e899806844714c57aecb4ae82f115))
+
 ## [1.9.2](https://github.com/yte-template-engine/yte/compare/v1.9.1...v1.9.2) (2025-11-25)
 
 

@@ -7,7 +7,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 name = "yte"
 readme = "README.md"
-version = "1.9.2"
+version = "1.9.3"
 requires-python = ">=3.8,<4.0"
 dependencies = [
   "argparse-dataclass>=2.0.0,<3",
