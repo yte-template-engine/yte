@@ -28,4 +28,4 @@ jobs:
       - uses: astral-sh/setup-uv@v5
 
       - name: Publish to PyPi
-        run: uv publish
+        run: uv build && uv publish
