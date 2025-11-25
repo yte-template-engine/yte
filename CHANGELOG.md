@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.2](https://github.com/yte-template-engine/yte/compare/v1.9.1...v1.9.2) (2025-11-25)
+
+
+### Performance Improvements
+
+* upgrade to argparse-dataclass 2.0 ([b7084a8](https://github.com/yte-template-engine/yte/commit/b7084a87c3c6283f1dc7b4bfb5e7343edd126736))
+
 ## [1.9.1](https://github.com/yte-template-engine/yte/compare/v1.9.0...v1.9.1) (2025-11-24)
 
 
