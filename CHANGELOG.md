@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.5](https://github.com/yte-template-engine/yte/compare/v1.9.4...v1.9.5) (2025-11-27)
+
+
+### Bug Fixes
+
+* store exception message in attribute ([4d87cb2](https://github.com/yte-template-engine/yte/commit/4d87cb2c48ba00f8aaa39da9dd23061b8d0aced7))
+
 ## [1.9.4](https://github.com/yte-template-engine/yte/compare/v1.9.3...v1.9.4) (2025-11-27)
 
 
