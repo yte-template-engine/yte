@@ -5,4 +5,5 @@ class YteError(Exception):
         section = (
             "in section /" + "/".join(context.template) if context else "at top level"
         )
-        super().__init__(f"Error processing template {section}: {msg}")
+        self.msg = f"Error processing template {section}: {msg}"
+        super().__init__(self.msg)
