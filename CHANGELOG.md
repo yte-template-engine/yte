@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.4](https://github.com/yte-template-engine/yte/compare/v1.9.3...v1.9.4) (2025-11-27)
+
+
+### Bug Fixes
+
+* adjust publish workflow permissions ([af24fb2](https://github.com/yte-template-engine/yte/commit/af24fb262091d808d848361e4bbd586657e7de40))
+
 ## [1.9.3](https://github.com/yte-template-engine/yte/compare/v1.9.2...v1.9.3) (2025-11-25)
 
 
